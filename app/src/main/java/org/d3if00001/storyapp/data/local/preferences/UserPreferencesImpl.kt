@@ -10,15 +10,17 @@ class UserPreferencesImpl(context:Context) : UserPreferenceRepository {
         private const val NAME = "name"
         private const val EMAIL ="email"
         private const val PASSWORD = "password"
+        private const val TOKEN = "token"
     }
     private val preferences = context.getSharedPreferences(PREFS_NAME,Context.MODE_PRIVATE)
     private val editor = preferences.edit()
 
-    override fun setUser(token:String) {
-        val editor = preferences.edit()
-        editor.putString(NAME,token.name)
+    override fun setUser(value:User,token:String) {
+        editor.putString(NAME,value.name)
         editor.putString(EMAIL,value.email)
         editor.putString(PASSWORD,value.password)
+        editor.putString(TOKEN,token)
+        editor.putBoolean("isLoggedIn",true)
         editor.apply()
     }
 
@@ -31,5 +33,10 @@ class UserPreferencesImpl(context:Context) : UserPreferenceRepository {
     }
     override fun isLoggedIn(): Boolean = preferences.getBoolean("isLoggedIn",false)
     override fun getToken(): String = preferences.getString("token","")?:""
+    override fun logout() {
+        editor.remove(TOKEN)
+        editor.putBoolean("isLoggedIn",false)
+        editor.apply()
+    }
 
 }
