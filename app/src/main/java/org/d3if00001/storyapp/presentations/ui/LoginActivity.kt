@@ -6,15 +6,21 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
+import dagger.hilt.android.AndroidEntryPoint
 import org.d3if00001.storyapp.databinding.ActivityLoginBinding
+import org.d3if00001.storyapp.presentations.viewmodels.HomeViewModel
 
+@AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
+    private lateinit var email : String
+    private lateinit var passwordEditText: String
     private var backPressedTime = 0L
     private val backPressedInterval = 2000L
-
+    private val homeViewModel: HomeViewModel by viewModels()
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         if (backPressedTime + backPressedInterval > System.currentTimeMillis()) {
@@ -29,8 +35,11 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        binding.loginButton
+        homeViewModel.isSession.observe(this){
+                isSet -> if(isSet) startActivity(Intent(this,HomeActivity::class.java))
+        }
+        email = binding.edLoginEmail.text.toString()
+        passwordEditText = binding.edLoginPassword.text.toString()
 
         binding.registerButton.setOnClickListener {
             startActivity(Intent(this@LoginActivity, RegisterActivity::class.java))
