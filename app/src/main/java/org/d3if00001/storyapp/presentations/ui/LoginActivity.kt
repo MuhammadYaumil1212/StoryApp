@@ -35,9 +35,6 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        homeViewModel.isSession.observe(this){
-                isSet -> if(isSet) startActivity(Intent(this,HomeActivity::class.java))
-        }
         email = binding.edLoginEmail.text.toString()
         passwordEditText = binding.edLoginPassword.text.toString()
 

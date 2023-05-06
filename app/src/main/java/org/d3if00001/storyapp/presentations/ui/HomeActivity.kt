@@ -42,7 +42,9 @@ class HomeActivity : AppCompatActivity(),View.OnClickListener {
         rvNotes = binding.rvNotes
         listNotes = ArrayList()
         rvNotes.setHasFixedSize(true)
+
         binding.textUsername.text = homeViewModel.getName()
+
         binding.logout.setOnClickListener {
             homeViewModel.logout()
             startActivity(Intent(this,LoginActivity::class.java))
