@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
@@ -43,7 +44,11 @@ class HomeActivity : AppCompatActivity(),View.OnClickListener {
         listNotes = ArrayList()
         rvNotes.setHasFixedSize(true)
 
-        binding.textUsername.text = homeViewModel.getName()
+        binding.textUsername.text = "loading...."
+        homeViewModel.getAuthToken()
+        homeViewModel.getToken.observe(this){
+            Toast.makeText(this,"Token is : $it",Toast.LENGTH_SHORT).show()
+        }
 
         binding.logout.setOnClickListener {
             homeViewModel.logout()
