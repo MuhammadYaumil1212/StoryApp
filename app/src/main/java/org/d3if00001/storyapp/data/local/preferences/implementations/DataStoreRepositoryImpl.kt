@@ -3,6 +3,7 @@ package org.d3if00001.storyapp.data.local.preferences.implementations
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -28,7 +29,7 @@ class DataStoreRepositoryImpl @Inject constructor(private val context: Context) 
 
     override suspend fun clearData(key: String) {
         val preferencesKey = stringPreferencesKey(key)
-        context.dataStore.edit { it.remove(preferencesKey) }
+        context.dataStore.edit { preferences-> preferences.remove(preferencesKey) }
     }
 
 }

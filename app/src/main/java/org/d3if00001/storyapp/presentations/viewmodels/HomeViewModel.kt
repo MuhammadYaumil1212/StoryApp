@@ -13,6 +13,9 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(private val repository: DataStoreRepository): ViewModel() {
     private val _setToken : MutableLiveData<String> = MutableLiveData<String>()
     val getToken : LiveData<String> = _setToken
+
+    private val _isLoggedIn : MutableLiveData<Boolean> = MutableLiveData<Boolean>()
+    val isLoggedIn : LiveData<Boolean> = _isLoggedIn
     companion object{
         private const val AUTHKEY = "key_auth"
     }
@@ -20,9 +23,13 @@ class HomeViewModel @Inject constructor(private val repository: DataStoreReposit
         repository.putAuthToken(AUTHKEY,value.toString())
     }
     fun getAuthToken() = viewModelScope.launch {
-        repository.getAuthToken(AUTHKEY).collect{
-            token->_setToken.value = token
+        repository.getAuthToken(AUTHKEY).collect{ token->
+            _setToken.value = token
+            _isLoggedIn.value = token != null
         }
     }
-    fun logout() = runBlocking { repository.clearData(AUTHKEY) }
+    fun logout() = runBlocking {
+        _isLoggedIn.value = false
+        repository.clearData(AUTHKEY)
+    }
 }

@@ -37,6 +37,7 @@ class HomeActivity : AppCompatActivity(),View.OnClickListener {
         }
     }
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -44,6 +45,11 @@ class HomeActivity : AppCompatActivity(),View.OnClickListener {
         listNotes = ArrayList()
         rvNotes.setHasFixedSize(true)
 
+        homeViewModel.isLoggedIn.observe(this){isLoggedIn ->
+            if (!isLoggedIn){
+                startActivity(Intent(this,LoginActivity::class.java))
+            }
+        }
         binding.textUsername.text = "loading...."
         homeViewModel.getAuthToken()
         homeViewModel.getToken.observe(this){

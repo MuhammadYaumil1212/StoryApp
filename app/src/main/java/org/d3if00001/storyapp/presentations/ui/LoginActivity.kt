@@ -38,6 +38,17 @@ class LoginActivity : AppCompatActivity() {
         email = binding.edLoginEmail.text.toString()
         passwordEditText = binding.edLoginPassword.text.toString()
 
+        homeViewModel.getAuthToken()
+        homeViewModel.isLoggedIn.observe(this){isLoggedIn ->
+            if (isLoggedIn){
+                startActivity(Intent(this,HomeActivity::class.java))
+            }
+        }
+
+        binding.loginButton.setOnClickListener {
+            
+        }
+
         binding.registerButton.setOnClickListener {
             startActivity(Intent(this@LoginActivity, RegisterActivity::class.java))
         }
