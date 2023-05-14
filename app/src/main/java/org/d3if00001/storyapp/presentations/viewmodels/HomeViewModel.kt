@@ -1,12 +1,10 @@
 package org.d3if00001.storyapp.presentations.viewmodels
 
-import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.d3if00001.storyapp.data.local.preferences.abstractions.DataStoreRepository
+import org.d3if00001.storyapp.domain.repository.DataStoreRepository
 import javax.inject.Inject
 
 @HiltViewModel
@@ -18,6 +16,7 @@ class HomeViewModel @Inject constructor(private val repository: DataStoreReposit
     val isLoggedIn : LiveData<Boolean> = _isLoggedIn
     companion object{
         private const val AUTHKEY = "key_auth"
+        private const val getId = "key_id"
     }
     fun setAuthToken(value : String?) = viewModelScope.launch {
         repository.putAuthToken(AUTHKEY,value.toString())

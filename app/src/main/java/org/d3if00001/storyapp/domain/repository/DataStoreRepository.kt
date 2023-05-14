@@ -1,4 +1,4 @@
-package org.d3if00001.storyapp.data.local.preferences.abstractions
+package org.d3if00001.storyapp.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 

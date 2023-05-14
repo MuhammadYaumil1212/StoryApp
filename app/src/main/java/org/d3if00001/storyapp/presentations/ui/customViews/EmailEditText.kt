@@ -60,10 +60,7 @@ class EmailEditText : AppCompatEditText,View.OnTouchListener {
                 if (text.toString().isNotEmpty()) showClearButton() else hideClearButton()
             }
 
-            override fun afterTextChanged(s: Editable?) {
-
-            }
-
+            override fun afterTextChanged(s: Editable?) {}
         })
     }
 

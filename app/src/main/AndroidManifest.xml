@@ -7,7 +7,7 @@
 
     <application
         android:allowBackup="false"
-        android:name=".presentations.ui.baseApp.BaseApp"
+        android:name=".presentations.ui.BaseApp"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@drawable/script"

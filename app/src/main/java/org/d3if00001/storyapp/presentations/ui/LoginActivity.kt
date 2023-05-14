@@ -4,23 +4,26 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import dagger.hilt.android.AndroidEntryPoint
+import org.d3if00001.storyapp.R
+import org.d3if00001.storyapp.data.local.room.entity.User
 import org.d3if00001.storyapp.databinding.ActivityLoginBinding
+import org.d3if00001.storyapp.presentations.viewmodels.AuthenticationViewModel
 import org.d3if00001.storyapp.presentations.viewmodels.HomeViewModel
 
 @AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
-    private lateinit var email : String
-    private lateinit var passwordEditText: String
     private var backPressedTime = 0L
     private val backPressedInterval = 2000L
     private val homeViewModel: HomeViewModel by viewModels()
+    private val authenticationViewModel: AuthenticationViewModel by viewModels()
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         if (backPressedTime + backPressedInterval > System.currentTimeMillis()) {
@@ -35,8 +38,6 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        email = binding.edLoginEmail.text.toString()
-        passwordEditText = binding.edLoginPassword.text.toString()
 
         homeViewModel.getAuthToken()
         homeViewModel.isLoggedIn.observe(this){isLoggedIn ->
@@ -46,7 +47,19 @@ class LoginActivity : AppCompatActivity() {
         }
 
         binding.loginButton.setOnClickListener {
-            
+            val user:User? = authenticationViewModel.authenticate(
+                email = binding.edLoginEmail.text.toString(),
+                password = binding.edLoginPassword.text.toString()
+            )
+            Log.d("user data","$user")
+            if(user!=null){
+                homeViewModel.setAuthToken(resources.getString(R.string.token))
+                startActivity(Intent(this@LoginActivity, HomeActivity::class.java))
+            }else{
+                Toast.makeText(this,
+                    "Data tidak terverifikasi! silahkan melakukan register",
+                    Toast.LENGTH_SHORT).show()
+            }
         }
 
         binding.registerButton.setOnClickListener {
