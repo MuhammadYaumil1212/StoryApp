@@ -51,7 +51,7 @@ class LoginActivity : AppCompatActivity() {
                 email = binding.edLoginEmail.text.toString(),
                 password = binding.edLoginPassword.text.toString()
             )
-            Log.d("user data","$user")
+
             if(user!=null){
                 homeViewModel.setAuthToken(resources.getString(R.string.token))
                 startActivity(Intent(this@LoginActivity, HomeActivity::class.java))
