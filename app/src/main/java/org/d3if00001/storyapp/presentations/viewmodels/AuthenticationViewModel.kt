@@ -22,15 +22,12 @@ class AuthenticationViewModel @Inject constructor(
     private var userRepository: UserRepository,
     private var dataStoreRepository: DataStoreRepository
     ):ViewModel() {
-    private val _getUserId : MutableLiveData<Int> = MutableLiveData<Int>()
-    val getUserId : LiveData<Int> = _getUserId
     companion object{
         const val ISLOGGEDIN = "is_loggedIn"
     }
 
     fun registerAccount(user:User){
          userRepository.registerAccount(user)
-        _getUserId.value = user.id
     }
 
     fun getLoggedIn():Boolean?= runBlocking {
