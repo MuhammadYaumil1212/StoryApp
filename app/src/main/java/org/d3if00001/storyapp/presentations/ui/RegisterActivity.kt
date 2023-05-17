@@ -31,16 +31,7 @@ class RegisterActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        homeViewModel.getAuthToken()
-        homeViewModel.isLoggedIn.observe(this){isLoggedIn ->
-            if (isLoggedIn){
-                startActivity(Intent(this,HomeActivity::class.java))
-            }
-        }
-
         binding.registerButton.setOnClickListener {
-            Log.d("data input","email : ${binding.edRegisterEmail.text.toString()}, password : ${binding.edRegisterPassword.text.toString()}, name:${binding.edRegisterName.text.toString()}")
             sanityCheck(
                 name=binding.edRegisterName.text.toString(),
                 email = binding.edRegisterEmail.text.toString(),
@@ -57,15 +48,16 @@ class RegisterActivity : AppCompatActivity() {
             }else if(password.isEmpty()){
                 Toast.makeText(this,"Password harus di isi",Toast.LENGTH_SHORT).show()
             }else{
-                authenticationViewModel.registerAccount(
+               authenticationViewModel.registerAccount(
                     User(
                         name = name,
                         email = email,
                         password = password
                     )
                 )
-                startActivity(Intent(this,HomeActivity::class.java))
-                homeViewModel.setAuthToken(resources.getString(R.string.token))
+                startActivity(Intent(this,LoginActivity::class.java))
+                Toast.makeText(this,"Berhasil! Silahkan Melakukan Login!",Toast.LENGTH_SHORT).show()
+                finishAffinity()
             }
         }
 }

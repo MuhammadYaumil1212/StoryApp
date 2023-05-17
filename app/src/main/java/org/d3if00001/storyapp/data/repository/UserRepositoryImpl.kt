@@ -4,7 +4,7 @@ import android.util.Log
 import org.d3if00001.storyapp.data.local.room.dao.UserDao
 import org.d3if00001.storyapp.data.local.room.entity.User
 
-import org.d3if00001.storyapp.domain.repository.UserRepository
+import org.d3if00001.storyapp.domain.models.repository.UserRepository
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
@@ -24,6 +24,10 @@ class UserRepositoryImpl @Inject constructor(
 
     override fun verifyLogin(email: String, password: String):User?{
         return userDao.loginAuthentication(email, password)
+    }
+
+    override fun getUser(id:Int): User {
+        return userDao.getUserById(id)
     }
 
 }

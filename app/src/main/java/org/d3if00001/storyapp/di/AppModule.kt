@@ -6,12 +6,12 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import org.d3if00001.storyapp.domain.repository.DataStoreRepository
+import org.d3if00001.storyapp.domain.models.repository.DataStoreRepository
 import org.d3if00001.storyapp.data.local.preferences.implementations.DataStoreRepositoryImpl
 import org.d3if00001.storyapp.data.local.room.dao.UserDao
 import org.d3if00001.storyapp.data.local.room.database.NoteDatabase
 import org.d3if00001.storyapp.data.repository.UserRepositoryImpl
-import org.d3if00001.storyapp.domain.repository.UserRepository
+import org.d3if00001.storyapp.domain.models.repository.UserRepository
 import javax.inject.Named
 import javax.inject.Singleton
 

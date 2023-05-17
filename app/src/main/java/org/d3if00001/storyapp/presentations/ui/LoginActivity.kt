@@ -2,6 +2,7 @@ package org.d3if00001.storyapp.presentations.ui
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.app.Service
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -10,6 +11,8 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.AndroidEntryPoint
 import org.d3if00001.storyapp.R
 import org.d3if00001.storyapp.data.local.room.entity.User
@@ -39,25 +42,19 @@ class LoginActivity : AppCompatActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        homeViewModel.getAuthToken()
-        homeViewModel.isLoggedIn.observe(this){isLoggedIn ->
-            if (isLoggedIn){
-                startActivity(Intent(this,HomeActivity::class.java))
-            }
-        }
-
         binding.loginButton.setOnClickListener {
-            val user:User? = authenticationViewModel.authenticate(
+            val user: User? = authenticationViewModel.authenticate(
                 email = binding.edLoginEmail.text.toString(),
                 password = binding.edLoginPassword.text.toString()
             )
-
-            if(user!=null){
-                homeViewModel.setAuthToken(resources.getString(R.string.token))
-                startActivity(Intent(this@LoginActivity, HomeActivity::class.java))
-            }else{
+            if (user != null) {
+                val userIntent = Intent(this, HomeActivity::class.java)
+                userIntent.putExtra(HomeActivity.extra_id, user.id)
+                startActivity(userIntent)
+                finishAffinity()
+            } else {
                 Toast.makeText(this,
-                    "Data tidak terverifikasi! silahkan melakukan register",
+                    "Data tidak terverifikasi! Silahkan melakukan registrasi.",
                     Toast.LENGTH_SHORT).show()
             }
         }

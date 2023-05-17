@@ -8,11 +8,11 @@ import org.d3if00001.storyapp.data.local.room.entity.User
 @Dao
 interface UserDao {
     @Transaction
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun register(user:User)
 
     @Transaction
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert
     fun addNote(note:Notes)
 
     @Transaction
@@ -27,6 +27,10 @@ interface UserDao {
             "ORDER BY id ASC"
     )
     fun showListNotesByUserId(userId:Int): LiveData<List<Notes>>
+
+    @Transaction
+    @Query("SELECT * FROM users WHERE id=:userId")
+    fun getUserById(userId:Int):User
 
     @Transaction
     @Query("SELECT imageStory,titleNotes,description,bodyNotes,date FROM Notes WHERE id = :id")
