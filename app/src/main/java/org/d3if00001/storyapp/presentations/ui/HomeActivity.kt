@@ -71,6 +71,10 @@ class HomeActivity : AppCompatActivity(),View.OnClickListener {
             binding.textUsername.text = user.name
         }
 
+        binding.fabPlus.setOnClickListener {
+            startActivity(Intent(this,AddStory::class.java))
+        }
+
         binding.logout.setOnClickListener {
             authenticationViewModel.logout()
             Toast.makeText(this,"berhasil keluar!",Toast.LENGTH_SHORT).show()
