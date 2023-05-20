@@ -6,9 +6,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import dagger.hilt.android.AndroidEntryPoint
 import org.d3if00001.storyapp.databinding.FragmentAddStoryBinding
 import org.d3if00001.storyapp.presentations.viewmodels.AddStoryViewModel
 
+@AndroidEntryPoint
 class AddStory : Fragment() {
     private val viewModel by viewModels<AddStoryViewModel>()
     private lateinit var binding:FragmentAddStoryBinding

@@ -8,6 +8,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import org.d3if00001.storyapp.data.local.room.entity.User
 import org.d3if00001.storyapp.domain.models.repository.DataStoreRepository
 import javax.inject.Inject
 
@@ -31,6 +32,16 @@ class DataStoreRepositoryImpl @Inject constructor(private val context: Context) 
     override suspend fun clearData(key: String) {
         val preferencesKey = stringPreferencesKey(key)
         context.dataStore.edit { preferences-> preferences.remove(preferencesKey) }
+    }
+
+    override suspend fun login(key: String, value: String){
+        val preferencesKey = stringPreferencesKey(key)
+        context.dataStore.edit { preferences->preferences[preferencesKey] = value }
+    }
+
+    override suspend fun register(key: String, value: String) {
+        val preferencesKey = stringPreferencesKey(key)
+        context.dataStore.edit { preferences->preferences[preferencesKey] = value }
     }
 
 }

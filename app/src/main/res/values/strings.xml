@@ -25,5 +25,6 @@
     <string name="text_not_available">data tidak tersedia</string>
     <string name="username_not_available">Username Tidak Tersedia</string>
     <string name="logout">Logout</string>
+    <string name="account_name">account name</string>
     <!-- Strings used for fragments for navigation -->
 </resources>

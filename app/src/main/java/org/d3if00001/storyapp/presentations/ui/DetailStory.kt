@@ -6,9 +6,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import dagger.hilt.android.AndroidEntryPoint
 import org.d3if00001.storyapp.R
 import org.d3if00001.storyapp.databinding.FragmentDetailStoryBinding
 
+@AndroidEntryPoint
 class DetailStory : BottomSheetDialogFragment() {
     private lateinit var binding : FragmentDetailStoryBinding
     companion object {

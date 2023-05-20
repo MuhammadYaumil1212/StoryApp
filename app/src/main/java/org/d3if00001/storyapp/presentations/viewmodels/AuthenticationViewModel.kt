@@ -24,23 +24,27 @@ class AuthenticationViewModel @Inject constructor(
     ):ViewModel() {
     companion object{
         const val ISLOGGEDIN = "is_loggedIn"
+        const val LOGIN = "login"
+        const val REGISTER = "register"
     }
 
-    fun registerAccount(user:User){
-         userRepository.registerAccount(user)
+   fun registerAccount(value:String)= runBlocking {
+       dataStoreRepository.register(REGISTER,value)
+   }
+
+    fun loginAccount(value: String)= runBlocking {
+        dataStoreRepository.login(LOGIN,value)
     }
 
     fun getLoggedIn():Boolean?= runBlocking {
         return@runBlocking dataStoreRepository.getLoggedIn(ISLOGGEDIN)
     }
-
-    fun authenticate(email: String, password: String): User? {
-        viewModelScope.launch {
-            dataStoreRepository.setLoggedIn(key = ISLOGGEDIN,loggedIn = true)
-        }
-        return userRepository.verifyLogin(email, password)
+    fun setLoggedIn(value: Boolean) = runBlocking {
+        dataStoreRepository.setLoggedIn(ISLOGGEDIN,value)
     }
     fun logout() = runBlocking {
         dataStoreRepository.clearData(ISLOGGEDIN)
+        dataStoreRepository.clearData(REGISTER)
+        dataStoreRepository.clearData(LOGIN)
     }
 }
