@@ -23,10 +23,10 @@ class DataStoreRepositoryImpl @Inject constructor(private val context: Context) 
         context.dataStore.edit { preferences->preferences[preferencesKey] = value}
     }
 
-    override suspend fun getToken(key: String): String {
+    override suspend fun getToken(key: String): String? {
         val preferencesKey = stringPreferencesKey(key)
         val preferences = context.dataStore.data.first()
-        return preferences[preferencesKey]!!
+        return preferences[preferencesKey]
     }
 
     override suspend fun setName(key: String, value: String) {

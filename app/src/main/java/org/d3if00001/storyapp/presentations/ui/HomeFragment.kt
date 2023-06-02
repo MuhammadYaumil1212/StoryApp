@@ -39,17 +39,12 @@ class HomeFragment : Fragment() {
         rvNotes.setHasFixedSize(true)
         binding.pgHome.visibility = View.GONE
 
-        runBlocking {
-            val token = authenticationViewModel.getToken()
-            if(token.isNotEmpty()){
-                val name = authenticationViewModel.getName()
-                binding.textUsername.text = name
-            }else{
-                authenticationViewModel.logout()
-                findNavController().navigate(R.id.action_homeFragment_to_loginFragment)
-            }
+        authenticationViewModel.getName()
+        authenticationViewModel.getNameUser.observe(viewLifecycleOwner){
+            name->binding.textUsername.text = name
         }
-        binding.fabPlus.setOnClickListener {view->
+
+            binding.fabPlus.setOnClickListener {view->
             view.findNavController().navigate(R.id.action_homeFragment_to_addStory)
         }
 

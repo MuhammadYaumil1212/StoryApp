@@ -4,7 +4,9 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.d3if00001.storyapp.data.remote.retrofit.APIConfig
 import org.d3if00001.storyapp.data.remote.retrofit.APIService
@@ -21,15 +23,23 @@ import javax.inject.Inject
 @HiltViewModel
 class AuthenticationViewModel @Inject constructor(
     private var dataStoreRepository: DataStoreRepository):ViewModel() {
-    private val _userAuth = MutableLiveData<LoginResponse>()
-    val userAuth : LiveData<LoginResponse> = _userAuth
     private val status = MutableLiveData<APIService.ApiStatus>()
+
+    private var _getDataToken:MutableLiveData<String?> = MutableLiveData()
+    val getDataToken:LiveData<String?> = _getDataToken
+
+    private var _getNameUser:MutableLiveData<String> = MutableLiveData()
+    val getNameUser:LiveData<String> = _getNameUser
     companion object{
         const val TOKEN_KEY = "token_key"
         const val USER_KEY = "user_key"
     }
-    suspend fun getToken() = dataStoreRepository.getToken(TOKEN_KEY)
-    suspend fun getName() = dataStoreRepository.getName(USER_KEY)
+    fun getToken() = viewModelScope.launch {
+        _getDataToken.value = dataStoreRepository.getToken(TOKEN_KEY)
+    }
+    fun getName() = viewModelScope.launch {
+        _getNameUser.value = dataStoreRepository.getName(USER_KEY)
+    }
     fun getStatus(): LiveData<APIService.ApiStatus> = status
     fun authentication(email:String,password: String){
         val loginModel = LoginResult(email = email, password = password)
@@ -66,13 +76,13 @@ class AuthenticationViewModel @Inject constructor(
     fun register(name:String,email:String,password: String){
         val registerModel = RegisterResult(name = name, email = email, password = password)
         val client = APIConfig.getApiService().register(registerModel)
+        status.postValue(APIService.ApiStatus.LOADING)
         client.enqueue(object : Callback<RegisterResponse>{
             override fun onResponse(
                 call: Call<RegisterResponse>,
                 response: Response<RegisterResponse>
             ) {
                 val responseBody = response.body()
-                status.postValue(APIService.ApiStatus.LOADING)
                 val resBody = responseBody?.RegisterResult
                 if(resBody == null){
                     status.postValue(APIService.ApiStatus.FAILED)

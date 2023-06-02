@@ -28,16 +28,16 @@ class LoginFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View{
         binding = FragmentLoginBinding.inflate(inflater,container,false)
+
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-            runBlocking {
-                val token = authenticationViewModel.getToken()
-                if(token.isNotEmpty()){
-                    findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
-                }
+            authenticationViewModel.getToken()
+            authenticationViewModel.getDataToken.observe(viewLifecycleOwner){
+                token->if(token?.isNotEmpty() == true) findNavController()
+                .navigate(R.id.action_loginFragment_to_homeFragment)
             }
             binding.loginButton.setOnClickListener {
                 sanityCheck(
@@ -51,8 +51,8 @@ class LoginFragment : Fragment() {
                     email=binding.edLoginEmail.text.toString(),
                     password=binding.edLoginPassword.text.toString()
                 )
-
             }
+
         binding.registerButton.setOnClickListener { views->
             views.findNavController().navigate(R.id.action_loginFragment_to_registerFragment)
         }
