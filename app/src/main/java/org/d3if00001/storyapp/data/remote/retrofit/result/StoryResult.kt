@@ -9,7 +9,7 @@ data class StoryResult(
     @SerializedName("description")
     val description: String, // Lorem Ipsum
     @SerializedName("id")
-    val id: String, // story-FvU4u0Vp2S3PMsFg
+    val id: Int, // story-FvU4u0Vp2S3PMsFg
     @SerializedName("name")
     val name: String, // Dimas
     @SerializedName("photoUrl")

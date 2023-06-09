@@ -1,27 +1,32 @@
 package org.d3if00001.storyapp.presentations.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.runBlocking
 import org.d3if00001.storyapp.R
+import org.d3if00001.storyapp.data.remote.retrofit.APIService
+import org.d3if00001.storyapp.data.remote.retrofit.result.StoryResult
 import org.d3if00001.storyapp.databinding.FragmentHomeBinding
+import org.d3if00001.storyapp.presentations.utils.StoryAdapter
 import org.d3if00001.storyapp.presentations.viewmodels.AuthenticationViewModel
-import org.d3if00001.storyapp.presentations.viewmodels.HomeViewModel
+import org.d3if00001.storyapp.presentations.viewmodels.StoryViewModel
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
-    private lateinit var rvNotes : RecyclerView
-//    private lateinit var listNotes : ArrayList<Notes>
-    private val homeViewModel : HomeViewModel by viewModels()
+    private lateinit var listNotes : ArrayList<StoryResult>
+    private val storyViewModel : StoryViewModel by viewModels()
     private val authenticationViewModel: AuthenticationViewModel by viewModels()
 
     override fun onCreateView(
@@ -29,38 +34,108 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
+
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        rvNotes = binding.rvNotes
-//        listNotes = ArrayList()
-        rvNotes.setHasFixedSize(true)
+        listNotes = ArrayList()
+        binding.rvNotes.setHasFixedSize(true)
         binding.pgHome.visibility = View.GONE
 
+        authenticationViewModel.getStatus().observe(viewLifecycleOwner) {
+            updateProgress(it)
+        }
         authenticationViewModel.getName()
-        authenticationViewModel.getNameUser.observe(viewLifecycleOwner){
-            name->binding.textUsername.text = name
+
+        authenticationViewModel.getNameUser.observe(viewLifecycleOwner) { name ->
+            binding.textUsername.text = name
         }
 
-            binding.fabPlus.setOnClickListener {view->
-            view.findNavController().navigate(R.id.action_homeFragment_to_addStory)
+        // Load data ke listNotes sebelum mengatur RecyclerView
+        listNotes.add(
+            StoryResult(
+                id=1,
+                name = "name",
+                description = "desc",
+                createdAt = "12/12/2023",
+                photoUrl = "photo.com"
+            )
+        )
+        listNotes.add(
+            StoryResult(
+                id=1,
+                name = "name",
+                description = "desc",
+                createdAt = "12/12/2023",
+                photoUrl = "photo.com"
+            )
+        )
+        listNotes.add(
+            StoryResult(
+                id=1,
+                name = "name",
+                description = "desc",
+                createdAt = "12/12/2023",
+                photoUrl = "photo.com"
+            )
+        )
+        listNotes.add(
+            StoryResult(
+                id=1,
+                name = "name",
+                description = "desc",
+                createdAt = "12/12/2023",
+                photoUrl = "photo.com"
+            )
+        )
+        listNotes.add(
+            StoryResult(
+                id=1,
+                name = "name",
+                description = "desc",
+                createdAt = "12/12/2023",
+                photoUrl = "photo.com"
+            )
+        )
+
+        if (listNotes.isEmpty()) {
+            binding.textNotAvailable.visibility = View.VISIBLE
+        } else {
+            val listNotesAdapter = StoryAdapter(listNotes)
+            binding.rvNotes.adapter = listNotesAdapter
+            listNotesAdapter.notifyDataSetChanged()
+            Log.d("list notes","${listNotesAdapter.itemCount}")
+            val layoutManager = LinearLayoutManager(requireContext())
+            binding.rvNotes.layoutManager = layoutManager
+            val itemDecoration = DividerItemDecoration(activity, layoutManager.orientation)
+            binding.rvNotes.addItemDecoration(itemDecoration)
+        }
+
+
+        binding.fabPlus.setOnClickListener { views ->
+            views.findNavController().navigate(R.id.action_homeFragment_to_addStory)
         }
 
         binding.logout.setOnClickListener {
             authenticationViewModel.logout()
             it.findNavController().navigate(R.id.action_homeFragment_to_loginFragment)
         }
-        //setRecyclerView
-//        setRecyclerView()
     }
-//    private fun setRecyclerView() {
-//        if(listNotes.isEmpty()){
-//            binding.textNotAvailable.visibility = View.VISIBLE
-//        }
-//        rvNotes.layoutManager = LinearLayoutManager(requireContext())
-//        val listNotesAdapter = HomeListAdapter(childFragmentManager,listNotes)
-//        rvNotes.adapter = listNotesAdapter
-//    }
+    private fun updateProgress(status: APIService.ApiStatus?) {
+        when(status){
+            APIService.ApiStatus.SUCCESS->{
+                binding.pgHome.visibility =View.GONE
+            }
+            APIService.ApiStatus.LOADING->binding.pgHome.visibility = View.VISIBLE
+            APIService.ApiStatus.FAILED->{
+                binding.pgHome.visibility = View.GONE
+                Toast.makeText(requireContext(),
+                    "Gagal! Silahkan Coba lagi",
+                    Toast.LENGTH_SHORT).show()
+            }
+            else ->binding.pgHome.visibility = View.GONE
+        }
+    }
 }
