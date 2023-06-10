@@ -1,5 +1,6 @@
 package org.d3if00001.storyapp.data.remote.retrofit
 
+import okhttp3.MultipartBody
 import org.d3if00001.storyapp.data.remote.retrofit.response.AddNewStoryResponse
 import org.d3if00001.storyapp.data.remote.retrofit.response.GetAllStoriesResponse
 import org.d3if00001.storyapp.data.remote.retrofit.response.LoginResponse
@@ -16,13 +17,15 @@ interface APIService {
     fun authentication(@Body loginResult: LoginResult):Call<LoginResponse>
     @POST("register")
     fun register(@Body registerResult:RegisterResult):Call<RegisterResponse>
-    @FormUrlEncoded
+
     @Multipart
+
     @POST("stories")
     fun addNewStory(
+        @Header("Authorization")Bearer:String,
         @Part("description")description:String,
-        @Part("photo")photo:File
+        @Part file: MultipartBody.Part,
     ):Call<AddNewStoryResponse>
     @GET("stories")
-    fun getAllStories():List<GetAllStoriesResponse>
+    fun getAllStories(@Header("Authorization")Bearer: String,@Query("location")location:Int):Call<GetAllStoriesResponse>
 }

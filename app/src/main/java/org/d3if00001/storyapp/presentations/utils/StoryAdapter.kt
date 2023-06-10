@@ -18,8 +18,7 @@ class StoryAdapter(private val listNotes:List<StoryResult>) :RecyclerView.Adapte
     override fun getItemCount(): Int = listNotes.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val (_,description,_,name,_) =listNotes[position]
-        holder.binding.titleStory.text = name
+        val (_,description,_,_) =listNotes[position]
         holder.binding.description.text = description
     }
 }

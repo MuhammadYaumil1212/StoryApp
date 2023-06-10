@@ -26,5 +26,9 @@
     <string name="username_not_available">Username Tidak Tersedia</string>
     <string name="logout">Logout</string>
     <string name="account_name">account name</string>
+    <string name="label">descriptions</string>
+    <string name="upload">Upload</string>
+    <string name="name">name</string>
+    <string name="imagepreview">imagePreview</string>
     <!-- Strings used for fragments for navigation -->
 </resources>

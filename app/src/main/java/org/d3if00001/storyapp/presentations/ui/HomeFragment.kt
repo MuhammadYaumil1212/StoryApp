@@ -1,5 +1,8 @@
 package org.d3if00001.storyapp.presentations.ui
 
+import android.content.ContentResolver
+import android.content.Context
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -19,6 +22,7 @@ import org.d3if00001.storyapp.data.remote.retrofit.APIService
 import org.d3if00001.storyapp.data.remote.retrofit.result.StoryResult
 import org.d3if00001.storyapp.databinding.FragmentHomeBinding
 import org.d3if00001.storyapp.presentations.utils.StoryAdapter
+import org.d3if00001.storyapp.presentations.viewmodels.AddStoryViewModel
 import org.d3if00001.storyapp.presentations.viewmodels.AuthenticationViewModel
 import org.d3if00001.storyapp.presentations.viewmodels.StoryViewModel
 
@@ -48,72 +52,31 @@ class HomeFragment : Fragment() {
             updateProgress(it)
         }
         authenticationViewModel.getName()
-
         authenticationViewModel.getNameUser.observe(viewLifecycleOwner) { name ->
             binding.textUsername.text = name
         }
-
-        // Load data ke listNotes sebelum mengatur RecyclerView
-        listNotes.add(
-            StoryResult(
-                id=1,
-                name = "name",
-                description = "desc",
-                createdAt = "12/12/2023",
-                photoUrl = "photo.com"
-            )
-        )
-        listNotes.add(
-            StoryResult(
-                id=1,
-                name = "name",
-                description = "desc",
-                createdAt = "12/12/2023",
-                photoUrl = "photo.com"
-            )
-        )
-        listNotes.add(
-            StoryResult(
-                id=1,
-                name = "name",
-                description = "desc",
-                createdAt = "12/12/2023",
-                photoUrl = "photo.com"
-            )
-        )
-        listNotes.add(
-            StoryResult(
-                id=1,
-                name = "name",
-                description = "desc",
-                createdAt = "12/12/2023",
-                photoUrl = "photo.com"
-            )
-        )
-        listNotes.add(
-            StoryResult(
-                id=1,
-                name = "name",
-                description = "desc",
-                createdAt = "12/12/2023",
-                photoUrl = "photo.com"
-            )
-        )
-
-        if (listNotes.isEmpty()) {
-            binding.textNotAvailable.visibility = View.VISIBLE
-        } else {
-            val listNotesAdapter = StoryAdapter(listNotes)
-            binding.rvNotes.adapter = listNotesAdapter
-            listNotesAdapter.notifyDataSetChanged()
-            Log.d("list notes","${listNotesAdapter.itemCount}")
-            val layoutManager = LinearLayoutManager(requireContext())
-            binding.rvNotes.layoutManager = layoutManager
-            val itemDecoration = DividerItemDecoration(activity, layoutManager.orientation)
-            binding.rvNotes.addItemDecoration(itemDecoration)
+        //data story
+        storyViewModel.getStatus().observe(viewLifecycleOwner){
+            updateProgress(it)
         }
+        // Load data ke listNotes sebelum mengatur RecyclerView
+        storyViewModel.getAllStories()
+        storyViewModel.getAllStories.observe(viewLifecycleOwner){ listStory->
+            listStory?.map { fragmentStory-> listNotes.add(fragmentStory) }
+                if (listNotes.isEmpty()) {
+                    binding.textNotAvailable.visibility = View.VISIBLE
+                } else {
 
+                    val listNotesAdapter = StoryAdapter(listNotes)
+                    binding.rvNotes.adapter = listNotesAdapter
+                    listNotesAdapter.notifyDataSetChanged()
 
+                    val layoutManager = LinearLayoutManager(requireContext())
+                    binding.rvNotes.layoutManager = layoutManager
+                    val itemDecoration = DividerItemDecoration(activity, layoutManager.orientation)
+                    binding.rvNotes.addItemDecoration(itemDecoration)
+                }
+        }
         binding.fabPlus.setOnClickListener { views ->
             views.findNavController().navigate(R.id.action_homeFragment_to_addStory)
         }
@@ -132,7 +95,7 @@ class HomeFragment : Fragment() {
             APIService.ApiStatus.FAILED->{
                 binding.pgHome.visibility = View.GONE
                 Toast.makeText(requireContext(),
-                    "Gagal! Silahkan Coba lagi",
+                    "Data Tidak Tersedia!",
                     Toast.LENGTH_SHORT).show()
             }
             else ->binding.pgHome.visibility = View.GONE

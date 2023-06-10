@@ -22,7 +22,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AuthenticationViewModel @Inject constructor(
-    private var dataStoreRepository: DataStoreRepository):ViewModel() {
+    private var dataStoreRepository: DataStoreRepository
+    ):ViewModel() {
     private val status = MutableLiveData<APIService.ApiStatus>()
 
     private var _getDataToken:MutableLiveData<String?> = MutableLiveData()
@@ -59,7 +60,6 @@ class AuthenticationViewModel @Inject constructor(
                             status.postValue(APIService.ApiStatus.SUCCESS)
                         }
                     }
-
                 }else{
                     status.postValue(APIService.ApiStatus.FAILED)
                     Log.e("response null", response.message())
