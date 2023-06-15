@@ -1,5 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">Story App</string>
+    <string name="app_name">Story App</string>
     <string name="title_activity_login">login</string>
     <string name="login_title">Login</string>
     <string name="login_hint">Login</string>
@@ -11,7 +12,7 @@
     <string name="register_title">Register</string>
     <string name="name_ed">Name</string>
     <string name="email_ed">Email</string>
-    <string name="syarat_amp_ketentuan"><![CDATA[Syarat & Ketentuan]]></string>
+    <string name="syarat_amp_ketentuan">Terms &amp; Condition</string>
     <string name="add_button_description">button add story</string>
     <string name="title_story">Title Story</string>
     <string name="description">description</string>
@@ -21,8 +22,8 @@
     <string name="login_header">Login</string>
     <string name="email_tv">Email</string>
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="text_not_available">data tidak tersedia</string>
-    <string name="username_not_available">Username Tidak Tersedia</string>
+    <string name="text_not_available">Story not found</string>
+    <string name="username_not_available">Username Unavailable</string>
     <string name="logout">Logout</string>
     <string name="account_name">account name</string>
     <string name="label">descriptions</string>
