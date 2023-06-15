@@ -15,6 +15,9 @@
         <action
             android:id="@+id/action_homeFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_detailStory2"
+            app:destination="@id/detailStory2" />
     </fragment>
     <fragment
         android:id="@+id/addStory"
@@ -46,4 +49,14 @@
             android:id="@+id/action_registerFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
     </fragment>
+    <dialog
+        android:id="@+id/detailStory2"
+        android:name="org.d3if00001.storyapp.presentations.ui.DetailStory"
+        android:label="fragment_detail_story"
+        tools:layout="@layout/fragment_detail_story" >
+        <argument
+            android:name="id"
+            app:argType="string"
+            android:defaultValue="id" />
+    </dialog>
 </navigation>
