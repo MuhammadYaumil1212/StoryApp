@@ -1,6 +1,7 @@
 package org.d3if00001.storyapp.data.remote.retrofit
 
 import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import org.d3if00001.storyapp.data.remote.retrofit.response.AddNewStoryResponse
 import org.d3if00001.storyapp.data.remote.retrofit.response.GetAllStoriesResponse
 import org.d3if00001.storyapp.data.remote.retrofit.response.GetDetailResponse
@@ -23,7 +24,7 @@ interface APIService {
     @POST("stories")
     fun addNewStory(
         @Header("Authorization")Bearer:String,
-        @Part("description")description:String,
+            @Part("description")description:RequestBody,
         @Part file: MultipartBody.Part,
     ):Call<AddNewStoryResponse>
     @GET("stories")

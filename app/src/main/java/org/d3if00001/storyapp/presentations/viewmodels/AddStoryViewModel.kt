@@ -11,6 +11,7 @@ import kotlinx.coroutines.runBlocking
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import org.d3if00001.storyapp.data.remote.retrofit.APIConfig
 import org.d3if00001.storyapp.data.remote.retrofit.APIService
 import org.d3if00001.storyapp.data.remote.retrofit.response.AddNewStoryResponse
@@ -61,10 +62,9 @@ class AddStoryViewModel @Inject constructor(private val dataStoreRepository: Dat
             runBlocking {
                 _authToken.value = dataStoreRepository.getToken(TOKEN_KEY)
             }
-            Log.i("token key","key : ${_authToken.value}")
             val apiService = APIConfig.getApiService()
             val uploadImageRequest = apiService.addNewStory(
-                description = description,
+                description = description.toRequestBody("text/plain".toMediaType()) ,
                 file = imageMultiPart,
                 Bearer = "Bearer ${_authToken.value!!}"
             )
