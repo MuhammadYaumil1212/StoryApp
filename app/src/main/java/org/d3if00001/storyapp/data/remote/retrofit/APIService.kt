@@ -17,7 +17,7 @@ interface APIService {
     @POST("login")
     fun authentication(@Body loginResult: LoginResult):Call<LoginResponse>
     @POST("register")
-    fun register(@Body registerResult:RegisterResult):Call<RegisterResponse>
+    suspend fun register(@Body registerResult:RegisterResult):RegisterResponse
 
     @Multipart
     @POST("stories")

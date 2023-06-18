@@ -118,7 +118,6 @@ class AddStory : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModelStory.getStatus().observe(viewLifecycleOwner){ updateProgress(it) }
-        viewModelStory.setDescription(binding.descriptionInput.text.toString())
         binding.imageCamera.setOnClickListener {
             if(!allPermissionsGranted()){
                 ActivityCompat.requestPermissions(requireActivity(), REQUIRED_PERMISSIONS,
@@ -128,7 +127,7 @@ class AddStory : Fragment() {
             }
         }
         binding.submitButton.setOnClickListener {
-            viewModelStory.uploadImage()
+            viewModelStory.uploadImage(description = binding.descriptionInput.text.toString())
         }
         binding.closeButton.setOnClickListener {viewBack->
             viewBack.findNavController().navigate(R.id.action_addStory_to_homeFragment)

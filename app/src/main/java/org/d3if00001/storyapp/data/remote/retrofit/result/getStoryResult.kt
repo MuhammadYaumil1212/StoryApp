@@ -1,9 +1,10 @@
 package org.d3if00001.storyapp.data.remote.retrofit.result
 
+
 import com.google.gson.annotations.SerializedName
 import java.io.File
 
-data class DetailResult(
+data class getStoryResult(
     @SerializedName("createdAt")
     val createdAt: String,
     @SerializedName("description")
@@ -12,10 +13,4 @@ data class DetailResult(
     val id: String,
     @SerializedName("photoUrl")
     val photo: String,
-    @SerializedName("name")
-    val name:String,
-    @SerializedName("lat")
-    val lat:String?=null,
-    @SerializedName("long")
-    val long:String?=null
 )

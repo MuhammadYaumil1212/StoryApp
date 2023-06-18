@@ -10,11 +10,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.d3if00001.storyapp.data.remote.retrofit.APIConfig
 import org.d3if00001.storyapp.data.remote.retrofit.APIService
+import org.d3if00001.storyapp.data.remote.retrofit.ApiResponse
 import org.d3if00001.storyapp.data.remote.retrofit.response.LoginResponse
 import org.d3if00001.storyapp.data.remote.retrofit.response.RegisterResponse
 import org.d3if00001.storyapp.data.remote.retrofit.result.LoginResult
 import org.d3if00001.storyapp.data.remote.retrofit.result.RegisterResult
 import org.d3if00001.storyapp.domain.repository.DataStoreRepository
+import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -31,6 +33,10 @@ class AuthenticationViewModel @Inject constructor(
 
     private var _getNameUser:MutableLiveData<String> = MutableLiveData()
     val getNameUser:LiveData<String> = _getNameUser
+
+    private var _registerResponse:MutableLiveData<ApiResponse<RegisterResponse>> = MutableLiveData()
+    val registerResponse:LiveData<ApiResponse<RegisterResponse>> get() = _registerResponse
+
     companion object{
         const val TOKEN_KEY = "token_key"
         const val USER_KEY = "user_key"
@@ -52,7 +58,6 @@ class AuthenticationViewModel @Inject constructor(
                 val loginToken = responseBody?.loginResult?.token
                 val loginName = responseBody?.loginResult?.name
                 if(response.isSuccessful){
-                    Log.d("success response", responseBody.toString())
                     runBlocking {
                         if (loginToken != null && loginName != null) {
                             dataStoreRepository.setToken(TOKEN_KEY,loginToken)
@@ -75,27 +80,20 @@ class AuthenticationViewModel @Inject constructor(
     }
     fun register(name:String,email:String,password: String){
         val registerModel = RegisterResult(name = name, email = email, password = password)
-        val client = APIConfig.getApiService().register(registerModel)
-        status.postValue(APIService.ApiStatus.LOADING)
-        client.enqueue(object : Callback<RegisterResponse>{
-            override fun onResponse(
-                call: Call<RegisterResponse>,
-                response: Response<RegisterResponse>
-            ) {
-                val responseBody = response.body()
-                val resBody = responseBody?.RegisterResult
-                if(resBody == null){
-                    status.postValue(APIService.ApiStatus.FAILED)
-                    Log.e("not found","Account not found")
+        viewModelScope.launch {
+            try {
+                _registerResponse.postValue(ApiResponse.Loading)
+                val client = APIConfig.getApiService().register(registerModel)
+                if(client.error){
+                    _registerResponse.postValue(ApiResponse.Error(client.message))
+                }else{
+                    _registerResponse.postValue(ApiResponse.Success(client))
                 }
-                status.postValue(APIService.ApiStatus.SUCCESS)
+            }catch (e:Exception){
+                _registerResponse.postValue(ApiResponse.Error(e.message.toString()))
             }
+        }
 
-            override fun onFailure(call: Call<RegisterResponse>, t: Throwable) {
-                Log.e("response failure","${t.message}")
-            }
-
-        })
     }
     fun logout() = runBlocking {
         dataStoreRepository.clearData(TOKEN_KEY)

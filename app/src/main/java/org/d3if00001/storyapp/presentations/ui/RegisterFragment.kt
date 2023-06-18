@@ -12,6 +12,7 @@ import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import org.d3if00001.storyapp.R
 import org.d3if00001.storyapp.data.remote.retrofit.APIService
+import org.d3if00001.storyapp.data.remote.retrofit.ApiResponse
 import org.d3if00001.storyapp.databinding.FragmentRegisterBinding
 import org.d3if00001.storyapp.presentations.viewmodels.AuthenticationViewModel
 
@@ -36,9 +37,7 @@ class RegisterFragment : Fragment() {
                 email = binding.edRegisterEmail.text.toString(),
                 password = binding.edRegisterPassword.text.toString()
             )
-            authenticationViewModel.getStatus().observe(viewLifecycleOwner) {
-                updateProgress(it)
-            }
+
             authenticationViewModel.register(
                 name = binding.edRegisterName.text.toString(),
                 email = binding.edRegisterEmail.text.toString(),
@@ -46,24 +45,27 @@ class RegisterFragment : Fragment() {
             )
 
         }
+        initObserver()
     }
+    fun initObserver(){
+       authenticationViewModel.registerResponse.observe(viewLifecycleOwner){
+           when(it){
+               is ApiResponse.Loading ->{
+                   binding.progressBar.visibility = View.VISIBLE
+               }
+               is ApiResponse.Success->{
+                   binding.progressBar.visibility = View.GONE
+               }
+               is ApiResponse.Error->{
+                   Toast.makeText(context,"registrasi gagal coba lagi!",Toast.LENGTH_SHORT).show()
+                   binding.progressBar.visibility = View.GONE
+               }
 
-    private fun updateProgress(status: APIService.ApiStatus?) {
-        when(status){
-            APIService.ApiStatus.SUCCESS->{
-                binding.progressBar.visibility =View.GONE
-                Toast.makeText(requireContext(),"Berhasil! Silahkan Login",Toast.LENGTH_SHORT).show()
-                findNavController().navigate(R.id.action_registerFragment_to_loginFragment)
-            }
-            APIService.ApiStatus.LOADING->binding.progressBar.visibility = View.VISIBLE
-            APIService.ApiStatus.FAILED->{
-                binding.progressBar.visibility = View.GONE
-                Toast.makeText(requireContext(),
-                    "Gagal! Silahkan coba lagi",
-                    Toast.LENGTH_SHORT).show()
-            }
-            else -> binding.progressBar.visibility = View.GONE
-        }
+               else -> {
+                   binding.progressBar.visibility = View.GONE
+               }
+           }
+       }
     }
 
     private fun sanityCheck(email : String, name:String, password:String){

@@ -2,13 +2,21 @@ package org.d3if00001.storyapp.presentations.utils
 
 import androidx.recyclerview.widget.DiffUtil
 import org.d3if00001.storyapp.data.remote.retrofit.result.StoryResult
+import org.d3if00001.storyapp.data.remote.retrofit.result.getStoryResult
 
-class StoryDiffUtil : DiffUtil.ItemCallback<StoryResult>() {
-    override fun areItemsTheSame(oldItem: StoryResult, newItem: StoryResult): Boolean {
-        return oldItem.id == newItem.id
-    }
+class StoryDiffUtil(private val mOldStoryList:List<getStoryResult>, private val newStoryList:List<getStoryResult>)
+    :DiffUtil.Callback() {
+    override fun getOldListSize(): Int = mOldStoryList.size
 
-    override fun areContentsTheSame(oldItem: StoryResult, newItem: StoryResult): Boolean {
-        return oldItem == newItem
+    override fun getNewListSize(): Int = newStoryList.size
+
+    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int)
+            : Boolean = mOldStoryList[oldItemPosition].id == newStoryList[newItemPosition].id
+
+    override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        val oldHoliday = mOldStoryList[oldItemPosition]
+        val newHoliday = newStoryList[newItemPosition]
+        return oldHoliday.description == newHoliday.description && oldHoliday.photo == newHoliday.photo
     }
 }
+

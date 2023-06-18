@@ -13,6 +13,7 @@ import org.d3if00001.storyapp.data.remote.retrofit.response.GetAllStoriesRespons
 import org.d3if00001.storyapp.data.remote.retrofit.response.GetDetailResponse
 import org.d3if00001.storyapp.data.remote.retrofit.result.DetailResult
 import org.d3if00001.storyapp.data.remote.retrofit.result.StoryResult
+import org.d3if00001.storyapp.data.remote.retrofit.result.getStoryResult
 import org.d3if00001.storyapp.domain.repository.DataStoreRepository
 import retrofit2.Call
 import retrofit2.Callback
@@ -27,8 +28,8 @@ class StoryViewModel @Inject constructor(private val dataStoreRepository: DataSt
     fun getStatus(): LiveData<APIService.ApiStatus> = status
     private var _authToken:MutableLiveData<String> = MutableLiveData()
 
-    private val _getAllStories:MutableLiveData<List<StoryResult>?> = MutableLiveData()
-    val getAllStories:LiveData<List<StoryResult>?> = _getAllStories
+    private val _getAllStories:MutableLiveData<List<getStoryResult>?> = MutableLiveData()
+    val getAllStories:LiveData<List<getStoryResult>?> = _getAllStories
 
     private val _getDetailStory:MutableLiveData<DetailResult> = MutableLiveData()
     val getDetailStory:LiveData<DetailResult> = _getDetailStory
@@ -54,7 +55,8 @@ class StoryViewModel @Inject constructor(private val dataStoreRepository: DataSt
                     id = responseResult!!.id,
                     description = responseResult.description,
                     createdAt = responseResult.createdAt,
-                    photo = responseResult.photo
+                    photo = responseResult.photo,
+                    name = responseResult.name
                 )
                 _getDetailStory.value = detailStory
                 status.postValue(APIService.ApiStatus.SUCCESS)
@@ -73,7 +75,7 @@ class StoryViewModel @Inject constructor(private val dataStoreRepository: DataSt
         }
         val clientApi = APIConfig.getApiService().getAllStories(
             Bearer = "Bearer ${_authToken.value!!}",
-            location = 1
+            location = 0
         )
         status.postValue(APIService.ApiStatus.LOADING)
         clientApi.enqueue(object : Callback<GetAllStoriesResponse>{

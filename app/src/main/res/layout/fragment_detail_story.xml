@@ -23,29 +23,30 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/photo"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView2"
-        tools:src="@tools:sample/avatars" />
+        <ImageView
+            android:id="@+id/photo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageView2"
+            tools:src="@tools:sample/avatars" />
 
-    <TextView
-        android:id="@+id/desc_detail"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="16dp"
-        android:text="Description"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/photo" />
+        <TextView
+            android:id="@+id/desc_detail"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="32dp"
+            android:layout_marginEnd="16dp"
+            android:text="Description"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/name" />
 
-    <TextView
+        <TextView
         android:id="@+id/created_at"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -69,6 +70,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.172" />
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="39dp"
+            android:layout_marginEnd="24dp"
+            android:text="TextView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/photo" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

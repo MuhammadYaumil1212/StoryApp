@@ -54,6 +54,7 @@ class DetailStory : BottomSheetDialogFragment() {
                 .load(it.photo)
                 .fitCenter()
                 .into(binding.photo)
+            binding.name.text = it.name
             binding.descDetail.text = it.description
             binding.createdAt.text = it.createdAt.format(dateFormat)
         }

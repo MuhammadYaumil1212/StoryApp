@@ -1,6 +1,7 @@
 package org.d3if00001.storyapp.presentations.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +15,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import org.d3if00001.storyapp.R
 import org.d3if00001.storyapp.data.remote.retrofit.APIService
 import org.d3if00001.storyapp.data.remote.retrofit.result.StoryResult
+import org.d3if00001.storyapp.data.remote.retrofit.result.getStoryResult
 import org.d3if00001.storyapp.databinding.FragmentHomeBinding
 import org.d3if00001.storyapp.presentations.utils.StoryAdapter
 import org.d3if00001.storyapp.presentations.viewmodels.AuthenticationViewModel
@@ -22,7 +24,7 @@ import org.d3if00001.storyapp.presentations.viewmodels.StoryViewModel
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
-    private lateinit var listNotes : ArrayList<StoryResult>
+    private lateinit var listNotes : ArrayList<getStoryResult>
     private val storyViewModel : StoryViewModel by viewModels()
     private val authenticationViewModel: AuthenticationViewModel by viewModels()
 
@@ -53,8 +55,6 @@ class HomeFragment : Fragment() {
         storyViewModel.getStatus().observe(viewLifecycleOwner){
             updateProgress(it)
         }
-        // Load data ke listNotes sebelum mengatur RecyclerView
-
         binding.fabPlus.setOnClickListener { views ->
             views.findNavController().navigate(R.id.action_homeFragment_to_addStory)
         }
@@ -67,20 +67,26 @@ class HomeFragment : Fragment() {
     private fun getAllStories(){
         storyViewModel.getAllStories()
         storyViewModel.getAllStories.observe(viewLifecycleOwner){ listStory->
-            listStory?.map { fragmentStory-> listNotes.add(fragmentStory) }
-            if (listNotes.isEmpty()) {
-                binding.textNotAvailable.visibility = View.VISIBLE
-            } else {
-                val listNotesAdapter = StoryAdapter(listNotes,requireContext())
-                binding.rvNotes.adapter = listNotesAdapter
-                listNotesAdapter.notifyDataSetChanged()
-
-                val layoutManager = LinearLayoutManager(requireContext())
-                binding.rvNotes.layoutManager = layoutManager
-                val itemDecoration = DividerItemDecoration(activity, layoutManager.orientation)
-                binding.rvNotes.addItemDecoration(itemDecoration)
+            listStory?.map { fragmentStory->
+                listNotes.add(fragmentStory)
+                if (listNotes.isEmpty()) {
+                    binding.textNotAvailable.visibility = View.VISIBLE
+                } else {
+                    val adapter = StoryAdapter(requireContext())
+                    adapter.setListNotes(listNotes)
+                    binding.rvNotes.adapter = adapter
+                    val layoutManager = LinearLayoutManager(requireContext())
+                    binding.rvNotes.layoutManager = layoutManager
+                    val itemDecoration = DividerItemDecoration(activity, layoutManager.orientation)
+                    binding.rvNotes.addItemDecoration(itemDecoration)
+                }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        listNotes
     }
     private fun updateProgress(status: APIService.ApiStatus?) {
         when(status){

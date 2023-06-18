@@ -3,11 +3,9 @@ package org.d3if00001.storyapp.presentations.viewmodels
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.runBlocking
 import okhttp3.MediaType.Companion.toMediaType
@@ -29,7 +27,6 @@ import javax.inject.Inject
 class AddStoryViewModel @Inject constructor(private val dataStoreRepository: DataStoreRepository) : ViewModel() {
     private val status = MutableLiveData<APIService.ApiStatus>()
     private var _getFile: File? = null
-    private var _descriptionText:MutableLiveData<String?> = MutableLiveData()
     private var _authToken:MutableLiveData<String> = MutableLiveData()
 
     companion object{
@@ -38,7 +35,6 @@ class AddStoryViewModel @Inject constructor(private val dataStoreRepository: Dat
     }
     fun getStatus(): LiveData<APIService.ApiStatus> = status
     fun setFile(file:File){_getFile = file}
-    fun setDescription(description:String){_descriptionText.value = description}
     private fun reduceImageSize(file:File):File{
         val bitmap = BitmapFactory.decodeFile(file.path)
         var compressQuality = 100
@@ -53,10 +49,9 @@ class AddStoryViewModel @Inject constructor(private val dataStoreRepository: Dat
         bitmap.compress(Bitmap.CompressFormat.JPEG,compressQuality,FileOutputStream(file))
         return file
     }
-    fun uploadImage(){
+    fun uploadImage(description:String){
         if(_getFile != null){
             val file = reduceImageSize(_getFile as File)
-            val description = _descriptionText.value
             val requestImageFile = file.asRequestBody("image/jpeg".toMediaType())
             val imageMultiPart: MultipartBody.Part = MultipartBody.Part.createFormData(
                 "photo",
@@ -69,7 +64,7 @@ class AddStoryViewModel @Inject constructor(private val dataStoreRepository: Dat
             Log.i("token key","key : ${_authToken.value}")
             val apiService = APIConfig.getApiService()
             val uploadImageRequest = apiService.addNewStory(
-                description = description.toString(),
+                description = description,
                 file = imageMultiPart,
                 Bearer = "Bearer ${_authToken.value!!}"
             )
