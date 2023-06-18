@@ -15,6 +15,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.runBlocking
 import org.d3if00001.storyapp.R
 import org.d3if00001.storyapp.data.remote.retrofit.APIService
+import org.d3if00001.storyapp.data.remote.retrofit.ApiResponse
 import org.d3if00001.storyapp.databinding.FragmentLoginBinding
 import org.d3if00001.storyapp.presentations.viewmodels.AuthenticationViewModel
 
@@ -44,14 +45,12 @@ class LoginFragment : Fragment() {
                     email = binding.edLoginEmail.text.toString(),
                     password = binding.edLoginPassword.text.toString()
                 )
-                authenticationViewModel.getStatus().observe(viewLifecycleOwner){
-                    updateProgress(it)
-                }
                 authenticationViewModel.authentication(
                     email=binding.edLoginEmail.text.toString(),
                     password=binding.edLoginPassword.text.toString()
                 )
             }
+            updateProgress()
 
         binding.registerButton.setOnClickListener { views->
             views.findNavController().navigate(R.id.action_loginFragment_to_registerFragment)
@@ -65,20 +64,22 @@ class LoginFragment : Fragment() {
             Toast.makeText(requireContext(),"Password harus di isi",Toast.LENGTH_SHORT).show()
         }
     }
-    private fun updateProgress(status: APIService.ApiStatus?) {
-        when(status){
-            APIService.ApiStatus.SUCCESS->{
-                binding.progressBar.visibility =View.GONE
-                findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
+    private fun updateProgress() {
+        authenticationViewModel.loginResponse.observe(viewLifecycleOwner){
+            when(it){
+                is ApiResponse.Success->{
+                    binding.progressBar.visibility =View.GONE
+                    findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
+                }
+                is ApiResponse.Loading->binding.progressBar.visibility = View.VISIBLE
+                is ApiResponse.Error->{
+                    binding.progressBar.visibility = View.GONE
+                    Toast.makeText(requireContext(),
+                        "Gagal! Silahkan daftarkan akun anda / coba lagi",
+                        Toast.LENGTH_SHORT).show()
+                }
+                else ->binding.progressBar.visibility = View.GONE
             }
-            APIService.ApiStatus.LOADING->binding.progressBar.visibility = View.VISIBLE
-            APIService.ApiStatus.FAILED->{
-                binding.progressBar.visibility = View.GONE
-                Toast.makeText(requireContext(),
-                    "Gagal! Silahkan daftarkan akun anda / coba lagi",
-                    Toast.LENGTH_SHORT).show()
-            }
-            else ->binding.progressBar.visibility = View.GONE
         }
     }
     private fun playAnimate(){

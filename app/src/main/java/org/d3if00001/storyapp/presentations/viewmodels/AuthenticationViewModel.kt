@@ -25,7 +25,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AuthenticationViewModel @Inject constructor(
     private var dataStoreRepository: DataStoreRepository
-    ):ViewModel() {
+):ViewModel() {
     private val status = MutableLiveData<APIService.ApiStatus>()
 
     private var _getDataToken:MutableLiveData<String?> = MutableLiveData()
@@ -36,6 +36,9 @@ class AuthenticationViewModel @Inject constructor(
 
     private var _registerResponse:MutableLiveData<ApiResponse<RegisterResponse>> = MutableLiveData()
     val registerResponse:LiveData<ApiResponse<RegisterResponse>> get() = _registerResponse
+
+    private var _loginResponse:MutableLiveData<ApiResponse<LoginResponse>> = MutableLiveData()
+    val loginResponse:LiveData<ApiResponse<LoginResponse>> get() = _loginResponse
 
     companion object{
         const val TOKEN_KEY = "token_key"
@@ -50,33 +53,29 @@ class AuthenticationViewModel @Inject constructor(
     fun getStatus(): LiveData<APIService.ApiStatus> = status
     fun authentication(email:String,password: String){
         val loginModel = LoginResult(email = email, password = password)
-        val client = APIConfig.getApiService().authentication(loginModel)
-        status.postValue(APIService.ApiStatus.LOADING)
-        client.enqueue(object : Callback<LoginResponse> {
-            override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
-                val responseBody = response.body()
-                val loginToken = responseBody?.loginResult?.token
-                val loginName = responseBody?.loginResult?.name
-                if(response.isSuccessful){
-                    runBlocking {
-                        if (loginToken != null && loginName != null) {
-                            dataStoreRepository.setToken(TOKEN_KEY,loginToken)
-                            dataStoreRepository.setToken(USER_KEY,loginName)
-                            status.postValue(APIService.ApiStatus.SUCCESS)
-                        }
-                    }
+        viewModelScope.launch {
+            try {
+                _loginResponse.postValue(ApiResponse.Loading)
+                val client = APIConfig.getApiService().authentication(loginModel)
+                if(client.error){
+                    _loginResponse.postValue(ApiResponse.Error(client.message))
                 }else{
-                    status.postValue(APIService.ApiStatus.FAILED)
-                    Log.e("response null", response.message())
+                    val token = client.loginResult.token
+                    val name = client.loginResult.name
+                    if (token != null && name != null) {
+                        dataStoreRepository.setToken(TOKEN_KEY,token)
+                        dataStoreRepository.setToken(USER_KEY,name)
+                        _loginResponse.postValue(ApiResponse.Success(client))
+                    }else{
+                        _loginResponse
+                            .postValue(ApiResponse.Error("Error Token & name is null"))
+                    }
+
                 }
+            }catch (e:Exception){
+                _loginResponse.postValue(ApiResponse.Error(e.message.toString()))
             }
-
-            override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
-                status.postValue(APIService.ApiStatus.FAILED)
-                Log.e("response failure","${t.message}")
-            }
-
-        })
+        }
     }
     fun register(name:String,email:String,password: String){
         val registerModel = RegisterResult(name = name, email = email, password = password)

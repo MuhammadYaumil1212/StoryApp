@@ -15,7 +15,7 @@ import java.io.File
 interface APIService {
     enum class ApiStatus { LOADING, SUCCESS, FAILED }
     @POST("login")
-    fun authentication(@Body loginResult: LoginResult):Call<LoginResponse>
+    suspend fun authentication(@Body loginResult: LoginResult):LoginResponse
     @POST("register")
     suspend fun register(@Body registerResult:RegisterResult):RegisterResponse
 

@@ -55,9 +55,10 @@ class RegisterFragment : Fragment() {
                }
                is ApiResponse.Success->{
                    binding.progressBar.visibility = View.GONE
+                   findNavController().navigate(R.id.action_registerFragment_to_loginFragment)
                }
                is ApiResponse.Error->{
-                   Toast.makeText(context,"registrasi gagal coba lagi!",Toast.LENGTH_SHORT).show()
+                   Toast.makeText(context,"Register gagal! silahkan coba lagi",Toast.LENGTH_SHORT).show()
                    binding.progressBar.visibility = View.GONE
                }
 
@@ -69,10 +70,10 @@ class RegisterFragment : Fragment() {
     }
 
     private fun sanityCheck(email : String, name:String, password:String){
-            if(email.isEmpty()){
-                Toast.makeText(requireContext(),"Email harus di isi",Toast.LENGTH_SHORT).show()
-            }else if(name.isEmpty()){
+            if(name.isEmpty()){
                 Toast.makeText(requireContext(),"Name harus di isi",Toast.LENGTH_SHORT).show()
+            }else if(email.isEmpty()){
+                Toast.makeText(requireContext(),"Email harus di isi",Toast.LENGTH_SHORT).show()
             }else if(password.isEmpty()){
                 Toast.makeText(requireContext(),"Password harus di isi",Toast.LENGTH_SHORT).show()
             }
