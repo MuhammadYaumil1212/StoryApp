@@ -35,10 +35,11 @@ class LoginFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-            authenticationViewModel.getToken()
             authenticationViewModel.getDataToken.observe(viewLifecycleOwner){
-                token->if(token?.isNotEmpty() == true) findNavController()
-                .navigate(R.id.action_loginFragment_to_homeFragment)
+                token->
+                if(token?.isNotEmpty() == true) {
+                    findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
+                }
             }
             binding.loginButton.setOnClickListener {
                 sanityCheck(

@@ -27,13 +27,11 @@ class HomeFragment : Fragment() {
     private lateinit var listNotes : ArrayList<getStoryResult>
     private val storyViewModel : StoryViewModel by viewModels()
     private val authenticationViewModel: AuthenticationViewModel by viewModels()
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
-
         return binding.root
     }
 
@@ -46,8 +44,7 @@ class HomeFragment : Fragment() {
         authenticationViewModel.getStatus().observe(viewLifecycleOwner) {
             updateProgress(it)
         }
-        authenticationViewModel.getName()
-        authenticationViewModel.getNameUser.observe(viewLifecycleOwner) { name ->
+        storyViewModel.getNameUser.observe(viewLifecycleOwner) { name ->
             binding.textUsername.text = name
         }
         //data story
@@ -61,7 +58,8 @@ class HomeFragment : Fragment() {
 
         binding.logout.setOnClickListener {
             authenticationViewModel.logout()
-            it.findNavController().navigate(R.id.action_homeFragment_to_loginFragment)
+            it.findNavController()
+                .navigate(R.id.action_homeFragment_to_loginFragment2)
         }
     }
     private fun getAllStories(){
@@ -84,10 +82,10 @@ class HomeFragment : Fragment() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        listNotes
-    }
+//    override fun onResume() {
+//        super.onResume()
+//        getAllStories()
+//    }
     private fun updateProgress(status: APIService.ApiStatus?) {
         when(status){
             APIService.ApiStatus.SUCCESS->{

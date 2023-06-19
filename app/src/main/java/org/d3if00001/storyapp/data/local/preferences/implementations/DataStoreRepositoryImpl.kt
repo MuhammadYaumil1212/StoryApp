@@ -13,9 +13,8 @@ private const val PREFERENCES_NAME = "User_datastore"
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = PREFERENCES_NAME)
 class DataStoreRepositoryImpl @Inject constructor(private val context: Context)  :
     DataStoreRepository {
-    override suspend fun clearData(key: String) {
-        val preferencesKey = stringPreferencesKey(key)
-        context.dataStore.edit { preferences-> preferences.remove(preferencesKey) }
+    override suspend fun clearData() {
+        context.dataStore.edit { preferences-> preferences.clear()}
     }
 
     override suspend fun setToken(key: String, value: String) {
@@ -37,7 +36,7 @@ class DataStoreRepositoryImpl @Inject constructor(private val context: Context) 
     override suspend fun getName(key: String): String {
         val preferencesKey = stringPreferencesKey(key)
         val preferences = context.dataStore.data.first()
-        return preferences[preferencesKey]!!
+        return preferences[preferencesKey]?:""
     }
 
 }

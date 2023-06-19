@@ -34,6 +34,9 @@ class StoryViewModel @Inject constructor(private val dataStoreRepository: DataSt
     private val _getDetailStory:MutableLiveData<DetailResult> = MutableLiveData()
     val getDetailStory:LiveData<DetailResult> = _getDetailStory
 
+    private var _getNameUser:MutableLiveData<String> = MutableLiveData()
+    val getNameUser:LiveData<String> = _getNameUser
+
     fun detailStory(id:String){
         runBlocking {
             _authToken.value = dataStoreRepository.getToken(AddStoryViewModel.TOKEN_KEY)
@@ -72,9 +75,10 @@ class StoryViewModel @Inject constructor(private val dataStoreRepository: DataSt
     fun getAllStories(){
         runBlocking {
             _authToken.value = dataStoreRepository.getToken(AddStoryViewModel.TOKEN_KEY)
+            _getNameUser.value = dataStoreRepository.getName(AuthenticationViewModel.USER_KEY)
         }
         val clientApi = APIConfig.getApiService().getAllStories(
-            Bearer = "Bearer ${_authToken.value!!}",
+            Bearer = "Bearer ${_authToken.value}",
             location = 0
         )
         status.postValue(APIService.ApiStatus.LOADING)
@@ -85,7 +89,7 @@ class StoryViewModel @Inject constructor(private val dataStoreRepository: DataSt
             ) {
                 val responseBody = response.body()
                 val resBody = responseBody?.listStory
-                if(resBody!!.isNotEmpty()){
+                if(resBody?.isNotEmpty() == true){
                     _getAllStories.value = resBody
                     status.postValue(APIService.ApiStatus.SUCCESS)
                 }else{

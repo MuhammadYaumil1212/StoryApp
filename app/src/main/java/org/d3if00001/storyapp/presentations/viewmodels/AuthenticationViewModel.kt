@@ -31,9 +31,6 @@ class AuthenticationViewModel @Inject constructor(
     private var _getDataToken:MutableLiveData<String?> = MutableLiveData()
     val getDataToken:LiveData<String?> = _getDataToken
 
-    private var _getNameUser:MutableLiveData<String> = MutableLiveData()
-    val getNameUser:LiveData<String> = _getNameUser
-
     private var _registerResponse:MutableLiveData<ApiResponse<RegisterResponse>> = MutableLiveData()
     val registerResponse:LiveData<ApiResponse<RegisterResponse>> get() = _registerResponse
 
@@ -44,11 +41,10 @@ class AuthenticationViewModel @Inject constructor(
         const val TOKEN_KEY = "token_key"
         const val USER_KEY = "user_key"
     }
-    fun getToken() = viewModelScope.launch {
-        _getDataToken.value = dataStoreRepository.getToken(TOKEN_KEY)
-    }
-    fun getName() = viewModelScope.launch {
-        _getNameUser.value = dataStoreRepository.getName(USER_KEY)
+    init {
+        viewModelScope.launch {
+            _getDataToken.value = dataStoreRepository.getToken(TOKEN_KEY)
+        }
     }
     fun getStatus(): LiveData<APIService.ApiStatus> = status
     fun authentication(email:String,password: String){
@@ -94,8 +90,7 @@ class AuthenticationViewModel @Inject constructor(
         }
 
     }
-    fun logout() = runBlocking {
-        dataStoreRepository.clearData(TOKEN_KEY)
-        dataStoreRepository.clearData(USER_KEY)
+    fun logout() = viewModelScope.launch{
+        dataStoreRepository.clearData()
     }
 }
