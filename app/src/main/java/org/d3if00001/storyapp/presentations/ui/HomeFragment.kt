@@ -1,14 +1,17 @@
 package org.d3if00001.storyapp.presentations.ui
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
@@ -27,6 +30,20 @@ class HomeFragment : Fragment() {
     private lateinit var listNotes : ArrayList<getStoryResult>
     private val storyViewModel : StoryViewModel by viewModels()
     private val authenticationViewModel: AuthenticationViewModel by viewModels()
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        val callback: OnBackPressedCallback =
+            object : OnBackPressedCallback(true)
+            {
+                override fun handleOnBackPressed() {
+                    requireActivity().finishAffinity()
+                }
+            }
+        requireActivity().onBackPressedDispatcher.addCallback(
+            this,
+            callback
+        )
+    }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -82,10 +99,6 @@ class HomeFragment : Fragment() {
         }
     }
 
-//    override fun onResume() {
-//        super.onResume()
-//        getAllStories()
-//    }
     private fun updateProgress(status: APIService.ApiStatus?) {
         when(status){
             APIService.ApiStatus.SUCCESS->{
