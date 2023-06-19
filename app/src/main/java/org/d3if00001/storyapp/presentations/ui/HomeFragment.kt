@@ -76,7 +76,7 @@ class HomeFragment : Fragment() {
         binding.logout.setOnClickListener {
             authenticationViewModel.logout()
             it.findNavController()
-                .navigate(R.id.action_homeFragment_to_loginFragment2)
+                .navigate(HomeFragmentDirections.actionHomeFragmentToLoginFragment2())
         }
     }
     private fun getAllStories(){
