@@ -131,14 +131,16 @@ class AddStory : Fragment() {
             viewModelStory.uploadImage(description = binding.descriptionInput.text.toString())
         }
         binding.closeButton.setOnClickListener {viewBack->
-            viewBack.findNavController().navigate(R.id.action_addStory_to_homeFragment)
+            viewBack.findNavController().navigate(
+                AddStoryDirections.actionAddStoryToHomeFragment()
+            )
         }
     }
     private fun updateProgress(status: APIService.ApiStatus?) {
         when(status){
             APIService.ApiStatus.SUCCESS->{
                 binding.pgInputStory.visibility =View.GONE
-                findNavController().navigate(R.id.action_addStory_to_homeFragment)
+                findNavController().navigate(AddStoryDirections.actionAddStoryToHomeFragment())
             }
             APIService.ApiStatus.LOADING->binding.pgInputStory.visibility = View.VISIBLE
             APIService.ApiStatus.FAILED->{
