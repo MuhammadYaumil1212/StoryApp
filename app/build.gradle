@@ -96,6 +96,8 @@ dependencies {
     implementation "androidx.camera:camera-view:${camerax_version}"
     //maps
     implementation 'com.google.maps.android:maps-utils-ktx:3.4.0'
+    //paging
+    implementation "androidx.paging:paging-runtime-ktx:3.1.1"
 }
 kapt {
     correctErrorTypes true

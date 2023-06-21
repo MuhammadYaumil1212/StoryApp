@@ -24,11 +24,14 @@ interface APIService {
     @POST("stories")
     fun addNewStory(
         @Header("Authorization")Bearer:String,
-            @Part("description")description:RequestBody,
+        @Part("description")description:RequestBody,
         @Part file: MultipartBody.Part,
     ):Call<AddNewStoryResponse>
     @GET("stories")
-    fun getAllStories(@Header("Authorization")Bearer: String,@Query("location")location:Int):Call<GetAllStoriesResponse>
+    suspend fun getAllStories(
+        @Header("Authorization")Bearer: String,
+        @Query("location")location:Int,
+        @Query("page")page:Int?=null):GetAllStoriesResponse
     @GET("stories/{id}")
     fun getDetailStories(@Header("Authorization")Bearer: String,@Path("id")id:String):Call<GetDetailResponse>
 }

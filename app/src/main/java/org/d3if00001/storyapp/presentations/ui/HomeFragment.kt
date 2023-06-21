@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import org.d3if00001.storyapp.R
 import org.d3if00001.storyapp.data.remote.retrofit.APIService
+import org.d3if00001.storyapp.data.remote.retrofit.ApiResponse
 import org.d3if00001.storyapp.data.remote.retrofit.result.StoryResult
 import org.d3if00001.storyapp.data.remote.retrofit.result.getStoryResult
 import org.d3if00001.storyapp.databinding.FragmentHomeBinding
@@ -59,17 +60,12 @@ class HomeFragment : Fragment() {
         binding.rvNotes.setHasFixedSize(true)
         binding.pgHome.visibility = View.GONE
 
-        authenticationViewModel.getStatus().observe(viewLifecycleOwner) {
-            updateProgress(it)
-        }
         storyViewModel.getNameUser.observe(viewLifecycleOwner) { name ->
             binding.textUsername.text = name
         }
         //data story
-        getAllStories()
-        storyViewModel.getStatus().observe(viewLifecycleOwner){
-            updateProgress(it)
-        }
+        storyViewModel.getAllStories()
+        updateProgress()
 
         binding.maps.setOnClickListener {
             startActivity(Intent(context,MapsActivity::class.java))
@@ -77,46 +73,45 @@ class HomeFragment : Fragment() {
         binding.fabPlus.setOnClickListener { views ->
             views.findNavController().navigate(R.id.action_homeFragment_to_addStory)
         }
-
         binding.logout.setOnClickListener {
             authenticationViewModel.logout()
             it.findNavController()
                 .navigate(HomeFragmentDirections.actionHomeFragmentToLoginFragment2())
         }
     }
-    private fun getAllStories(){
-        storyViewModel.getAllStories()
-        storyViewModel.getAllStories.observe(viewLifecycleOwner){ listStory->
-            listStory?.map { fragmentStory->
-                listNotes.add(fragmentStory)
-                if (listNotes.isEmpty()) {
-                    binding.textNotAvailable.visibility = View.VISIBLE
-                } else {
-                    val adapter = StoryAdapter(requireContext())
-                    adapter.setListNotes(listNotes)
-                    binding.rvNotes.adapter = adapter
-                    val layoutManager = LinearLayoutManager(requireContext())
-                    binding.rvNotes.layoutManager = layoutManager
-                    val itemDecoration = DividerItemDecoration(activity, layoutManager.orientation)
-                    binding.rvNotes.addItemDecoration(itemDecoration)
+
+    private fun updateProgress() {
+        storyViewModel.getAllStories.observe(viewLifecycleOwner){
+            when(it){
+                is ApiResponse.Loading ->{
+                    binding.pgHome.visibility = View.VISIBLE
+                }
+                is ApiResponse.Success->{
+                    binding.pgHome.visibility = View.GONE
+                    it.data.listStory.map { fragmentStory->
+                        listNotes.add(fragmentStory)
+                        if (listNotes.isEmpty()) {
+                            binding.textNotAvailable.visibility = View.VISIBLE
+                        } else {
+                            val adapter = StoryAdapter(requireContext())
+                            adapter.setListNotes(listNotes)
+                            binding.rvNotes.adapter = adapter
+                            val layoutManager = LinearLayoutManager(requireContext())
+                            binding.rvNotes.layoutManager = layoutManager
+                            val itemDecoration = DividerItemDecoration(activity, layoutManager.orientation)
+                            binding.rvNotes.addItemDecoration(itemDecoration)
+                        }
+                    }
+                }
+                is ApiResponse.Error->{
+                    Toast.makeText(context,"Gagal Catch data!",Toast.LENGTH_SHORT).show()
+                    binding.pgHome.visibility = View.GONE
+                }
+
+                else -> {
+                    binding.pgHome.visibility = View.GONE
                 }
             }
-        }
-    }
-
-    private fun updateProgress(status: APIService.ApiStatus?) {
-        when(status){
-            APIService.ApiStatus.SUCCESS->{
-                binding.pgHome.visibility =View.GONE
-            }
-            APIService.ApiStatus.LOADING->binding.pgHome.visibility = View.VISIBLE
-            APIService.ApiStatus.FAILED->{
-                binding.pgHome.visibility = View.GONE
-                Toast.makeText(requireContext(),
-                    "Data Tidak Tersedia!",
-                    Toast.LENGTH_SHORT).show()
-            }
-            else ->binding.pgHome.visibility = View.GONE
         }
     }
 }

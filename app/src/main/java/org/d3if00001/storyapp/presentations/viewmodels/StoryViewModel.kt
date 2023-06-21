@@ -1,38 +1,34 @@
 package org.d3if00001.storyapp.presentations.viewmodels
 
+import android.os.Message
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import okhttp3.internal.format
 import org.d3if00001.storyapp.data.remote.retrofit.APIConfig
 import org.d3if00001.storyapp.data.remote.retrofit.APIService
+import org.d3if00001.storyapp.data.remote.retrofit.ApiResponse
 import org.d3if00001.storyapp.data.remote.retrofit.response.GetAllStoriesResponse
 import org.d3if00001.storyapp.data.remote.retrofit.response.GetDetailResponse
 import org.d3if00001.storyapp.data.remote.retrofit.result.DetailResult
-import org.d3if00001.storyapp.data.remote.retrofit.result.StoryResult
 import org.d3if00001.storyapp.data.remote.retrofit.result.getStoryResult
 import org.d3if00001.storyapp.domain.repository.DataStoreRepository
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.text.DateFormat
-import java.util.Date
 import javax.inject.Inject
 
 @HiltViewModel
-class StoryViewModel @Inject constructor(private val dataStoreRepository: DataStoreRepository): ViewModel() {
+class StoryViewModel @Inject constructor(
+    private val dataStoreRepository: DataStoreRepository
+): ViewModel() {
     private val status = MutableLiveData<APIService.ApiStatus>()
     fun getStatus(): LiveData<APIService.ApiStatus> = status
     private var _authToken:MutableLiveData<String> = MutableLiveData()
-
-    private val _getAllStories:MutableLiveData<List<getStoryResult>?> = MutableLiveData()
-    val getAllStories:LiveData<List<getStoryResult>?> = _getAllStories
 
     private val _getDetailStory:MutableLiveData<DetailResult> = MutableLiveData()
     val getDetailStory:LiveData<DetailResult> = _getDetailStory
@@ -42,6 +38,12 @@ class StoryViewModel @Inject constructor(private val dataStoreRepository: DataSt
 
     private var _listLocationStory:MutableLiveData<List<getStoryResult>?> = MutableLiveData()
     val listLocationStory:LiveData<List<getStoryResult>?> = _listLocationStory
+
+    private var _getMapStories:MutableLiveData<ApiResponse<GetAllStoriesResponse>> = MutableLiveData()
+    val getMapStories:LiveData<ApiResponse<GetAllStoriesResponse>> get() = _getMapStories
+
+    private var _getAllStories:MutableLiveData<ApiResponse<GetAllStoriesResponse>> = MutableLiveData()
+    val getAllStories:LiveData<ApiResponse<GetAllStoriesResponse>> get() = _getAllStories
 
 
     fun detailStory(id:String){
@@ -81,63 +83,43 @@ class StoryViewModel @Inject constructor(private val dataStoreRepository: DataSt
     }
     fun getMapStories(){
         viewModelScope.launch {
-            _authToken.value = dataStoreRepository.getToken(AddStoryViewModel.TOKEN_KEY)
-        }
-        val clientApi = APIConfig.getApiService().getAllStories(
-            Bearer = "Bearer ${_authToken.value}",
-            location = 1
-        )
-        status.postValue(APIService.ApiStatus.LOADING)
-        clientApi.enqueue(object : Callback<GetAllStoriesResponse> {
-            override fun onResponse(
-                call: Call<GetAllStoriesResponse>,
-                response: Response<GetAllStoriesResponse>
-            ) {
-               if(response.isSuccessful){
-                   val listResponse = response.body()?.listStory
-                   _listLocationStory.postValue(listResponse)
-                    status.postValue(APIService.ApiStatus.SUCCESS)
-               }else{
-                   status.postValue(APIService.ApiStatus.FAILED)
-               }
+            try {
+                _authToken.value = dataStoreRepository.getToken(AddStoryViewModel.TOKEN_KEY)
+                val clientApi = APIConfig.getApiService().getAllStories(
+                    Bearer = "Bearer ${_authToken.value}",
+                    location = 1,
+                )
+                if(clientApi.error){
+                    _getMapStories.postValue(ApiResponse.Error(clientApi.message))
+                }else{
+                    _getMapStories.postValue(ApiResponse.Success(clientApi))
+                }
+            }catch (e:Exception){
+                _getMapStories.postValue(ApiResponse.Error(e.message.toString()))
+            }
 
-            }
-            override fun onFailure(call: Call<GetAllStoriesResponse>, t: Throwable) {
-                status.postValue(APIService.ApiStatus.FAILED)
-            }
-        })
+        }
     }
     fun getAllStories(){
         runBlocking {
             _authToken.value = dataStoreRepository.getToken(AddStoryViewModel.TOKEN_KEY)
             _getNameUser.value = dataStoreRepository.getName(AuthenticationViewModel.USER_KEY)
         }
-        val clientApi = APIConfig.getApiService().getAllStories(
-            Bearer = "Bearer ${_authToken.value}",
-            location = 0
-        )
-        status.postValue(APIService.ApiStatus.LOADING)
-        clientApi.enqueue(object : Callback<GetAllStoriesResponse>{
-            override fun onResponse(
-                call: Call<GetAllStoriesResponse>,
-                response: Response<GetAllStoriesResponse>
-            ) {
-                val responseBody = response.body()
-                val resBody = responseBody?.listStory
-                if(resBody?.isNotEmpty() == true){
-                    _getAllStories.value = resBody
-                    status.postValue(APIService.ApiStatus.SUCCESS)
+        viewModelScope.launch {
+            try {
+                val clientApi = APIConfig.getApiService().getAllStories(
+                    Bearer = "Bearer ${_authToken.value}",
+                    location = 0,
+                    page = 1
+                )
+                if(clientApi.error){
+                    _getAllStories.postValue(ApiResponse.Error(clientApi.message))
                 }else{
-                    status.postValue(APIService.ApiStatus.FAILED)
-                    Log.e("error resBody","response body is null")
+                    _getAllStories.postValue(ApiResponse.Success(clientApi))
                 }
+            }catch (e:Exception){
+                _getAllStories.postValue(ApiResponse.Error(e.message.toString()))
             }
-
-            override fun onFailure(call: Call<GetAllStoriesResponse>, t: Throwable) {
-                status.postValue(APIService.ApiStatus.FAILED)
-                Log.e("failure response","${t.message}")
-            }
-
-        })
+        }
     }
 }

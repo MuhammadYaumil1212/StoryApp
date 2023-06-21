@@ -2,8 +2,11 @@ package org.d3if00001.storyapp.presentations.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -13,6 +16,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import dagger.hilt.android.AndroidEntryPoint
 import org.d3if00001.storyapp.R
+import org.d3if00001.storyapp.data.remote.retrofit.ApiResponse
 import org.d3if00001.storyapp.databinding.ActivityMapsBinding
 import org.d3if00001.storyapp.presentations.viewmodels.StoryViewModel
 
@@ -38,16 +42,28 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap.uiSettings.isZoomControlsEnabled = true
         mMap.uiSettings.isCompassEnabled = true
         mMap.uiSettings.isMapToolbarEnabled = true
+
         storyViewModel.getMapStories()
-        storyViewModel.listLocationStory.observe(this){listStory->
-            listStory?.map {fragmentStory->
-                // Add a marker in Sydney and move the camera
-                val positionMarker = LatLng(fragmentStory.lat!!, fragmentStory.lon!!)
-                mMap.addMarker(
-                    MarkerOptions()
-                        .position(positionMarker).title(fragmentStory.description)
-                )
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(positionMarker))
+        updateProgress()
+    }
+    private fun updateProgress() {
+        storyViewModel.getMapStories.observe(this){
+            when(it){
+                is ApiResponse.Loading ->{}
+                is ApiResponse.Success->{
+                    it.data.listStory.map { fragmentStory->
+                        // Add a marker in Sydney and move the camera
+                        val positionMarker = LatLng(fragmentStory.lat!!, fragmentStory.lon!!)
+                        mMap.addMarker(
+                            MarkerOptions()
+                                .position(positionMarker).title(fragmentStory.description)
+                        )
+                        mMap.moveCamera(CameraUpdateFactory.newLatLng(positionMarker))
+                    }
+                }
+                is ApiResponse.Error->{Toast.makeText(this,"Gagal Catch data!",Toast.LENGTH_SHORT).show()}
+
+                else -> {}
             }
         }
     }
