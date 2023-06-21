@@ -6,30 +6,32 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <!-- Text Username -->
+    <!-- RecyclerView List -->
     <TextView
         android:id="@+id/text_username"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:padding="10dp"
+        android:text="@string/account_name"
         android:textSize="18sp"
         android:textStyle="bold"
-        android:text="@string/account_name"
         android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-    <!-- RecyclerView List -->
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_notes"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        tools:listitem="@layout/item_notes"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_username" />
+        app:layout_constraintTop_toBottomOf="@+id/text_username"
+        tools:listitem="@layout/item_notes" />
 
     <!-- Text Not Available -->
     <TextView
@@ -72,6 +74,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+
+
     <ProgressBar
         android:id="@+id/pg_home"
         style="?android:attr/progressBarStyle"
@@ -82,5 +86,19 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/text_username" />
+
+    <ImageView
+        android:id="@+id/maps"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="24dp"
+        app:layout_constraintBottom_toTopOf="@+id/rv_notes"
+        app:layout_constraintEnd_toStartOf="@+id/logout"
+        app:layout_constraintHorizontal_bias="0.942"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/text_username"
+        app:layout_constraintVertical_bias="0.45"
+        app:srcCompat="@drawable/pin_drop_black" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

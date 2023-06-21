@@ -13,4 +13,8 @@ data class getStoryResult(
     val id: String,
     @SerializedName("photoUrl")
     val photo: String,
+    @SerializedName("lat")
+    val lat:Double?=null,
+    @SerializedName("lon")
+    val lon:Double?=null
 )

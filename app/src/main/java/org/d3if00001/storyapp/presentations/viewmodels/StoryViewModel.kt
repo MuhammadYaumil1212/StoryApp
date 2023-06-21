@@ -4,7 +4,10 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import okhttp3.internal.format
 import org.d3if00001.storyapp.data.remote.retrofit.APIConfig
@@ -36,6 +39,10 @@ class StoryViewModel @Inject constructor(private val dataStoreRepository: DataSt
 
     private var _getNameUser:MutableLiveData<String> = MutableLiveData()
     val getNameUser:LiveData<String> = _getNameUser
+
+    private var _listLocationStory:MutableLiveData<List<getStoryResult>?> = MutableLiveData()
+    val listLocationStory:LiveData<List<getStoryResult>?> = _listLocationStory
+
 
     fun detailStory(id:String){
         runBlocking {
@@ -70,6 +77,34 @@ class StoryViewModel @Inject constructor(private val dataStoreRepository: DataSt
                 status.postValue(APIService.ApiStatus.FAILED)
             }
 
+        })
+    }
+    fun getMapStories(){
+        viewModelScope.launch {
+            _authToken.value = dataStoreRepository.getToken(AddStoryViewModel.TOKEN_KEY)
+        }
+        val clientApi = APIConfig.getApiService().getAllStories(
+            Bearer = "Bearer ${_authToken.value}",
+            location = 1
+        )
+        status.postValue(APIService.ApiStatus.LOADING)
+        clientApi.enqueue(object : Callback<GetAllStoriesResponse> {
+            override fun onResponse(
+                call: Call<GetAllStoriesResponse>,
+                response: Response<GetAllStoriesResponse>
+            ) {
+               if(response.isSuccessful){
+                   val listResponse = response.body()?.listStory
+                   _listLocationStory.postValue(listResponse)
+                    status.postValue(APIService.ApiStatus.SUCCESS)
+               }else{
+                   status.postValue(APIService.ApiStatus.FAILED)
+               }
+
+            }
+            override fun onFailure(call: Call<GetAllStoriesResponse>, t: Throwable) {
+                status.postValue(APIService.ApiStatus.FAILED)
+            }
         })
     }
     fun getAllStories(){

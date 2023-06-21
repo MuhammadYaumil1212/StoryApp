@@ -1,6 +1,7 @@
 package org.d3if00001.storyapp.presentations.ui
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -68,6 +69,10 @@ class HomeFragment : Fragment() {
         getAllStories()
         storyViewModel.getStatus().observe(viewLifecycleOwner){
             updateProgress(it)
+        }
+
+        binding.maps.setOnClickListener {
+            startActivity(Intent(context,MapsActivity::class.java))
         }
         binding.fabPlus.setOnClickListener { views ->
             views.findNavController().navigate(R.id.action_homeFragment_to_addStory)
