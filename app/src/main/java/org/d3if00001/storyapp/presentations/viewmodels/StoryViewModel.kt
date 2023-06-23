@@ -26,85 +26,60 @@ import org.d3if00001.storyapp.domain.repository.DataStoreRepository
 import org.d3if00001.storyapp.domain.repository.StoryRepository
 import retrofit2.Call
 import retrofit2.Callback
+import retrofit2.HttpException
 import retrofit2.Response
+import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
 class StoryViewModel @Inject constructor(
     private val dataStoreRepository: DataStoreRepository,
-    storyRepository: StoryRepository
+    private val storyRepository: StoryRepository
 ): ViewModel() {
-    private val status = MutableLiveData<APIService.ApiStatus>()
-    fun getStatus(): LiveData<APIService.ApiStatus> = status
-    private var _authToken:MutableLiveData<String> = MutableLiveData()
-
-    private val _getDetailStory:MutableLiveData<DetailResult> = MutableLiveData()
-    val getDetailStory:LiveData<DetailResult> = _getDetailStory
-
     private var _getNameUser:MutableLiveData<String> = MutableLiveData()
     val getNameUser:LiveData<String> = _getNameUser
-
+    
     private var _getMapStories:MutableLiveData<ApiResponse<GetAllStoriesResponse>> = MutableLiveData()
     val getMapStories:LiveData<ApiResponse<GetAllStoriesResponse>> get() = _getMapStories
+
+    private val _getDetailStory: MutableLiveData<ApiResponse<GetDetailResponse>> = MutableLiveData()
+    val getDetailStory:LiveData<ApiResponse<GetDetailResponse>> = _getDetailStory
+
     val story:Flow<PagingData<getStoryResult>> = storyRepository.getStory().cachedIn(viewModelScope)
     init {
         viewModelScope.launch {
             _getNameUser.value = dataStoreRepository.getName(AuthenticationViewModel.USER_KEY)
         }
     }
-    fun detailStory(id:String){
-        runBlocking {
-            _authToken.value = dataStoreRepository.getToken(AddStoryViewModel.TOKEN_KEY)
-        }
-        val clientApi = APIConfig.getApiService().getDetailStories(
-            Bearer="Bearer ${_authToken.value!!}",
-            id = id
-        )
-
-        status.postValue(APIService.ApiStatus.LOADING)
-        clientApi.enqueue(object : Callback<GetDetailResponse>{
-            override fun onResponse(
-                call: Call<GetDetailResponse>,
-                response: Response<GetDetailResponse>
-            ) {
-                val responseBody = response.body()
-                val responseResult = responseBody?.story
-                val detailStory = DetailResult(
-                    id = responseResult!!.id,
-                    description = responseResult.description,
-                    createdAt = responseResult.createdAt,
-                    photo = responseResult.photo,
-                    name = responseResult.name
-                )
-                _getDetailStory.value = detailStory
-                status.postValue(APIService.ApiStatus.SUCCESS)
+    fun getDetailStory(id:String) = viewModelScope.launch {
+        try{
+            val clientApi = storyRepository.detailStory(id)
+            if(clientApi.error){
+                _getDetailStory.postValue(ApiResponse.Error(clientApi.message))
+            }else{
+                _getDetailStory.postValue(ApiResponse.Success(clientApi))
             }
-
-            override fun onFailure(call: Call<GetDetailResponse>, t: Throwable) {
-                Log.d("data failure","${t.message}")
-                status.postValue(APIService.ApiStatus.FAILED)
-            }
-
-        })
-    }
-    fun getMapStories(){
-        viewModelScope.launch {
-            try {
-                _authToken.value = dataStoreRepository.getToken(AddStoryViewModel.TOKEN_KEY)
-                val clientApi = APIConfig.getApiService().getAllStories(
-                    Bearer = "Bearer ${_authToken.value}",
-                    location = 1,
-                )
-                if(clientApi.error){
-                    _getMapStories.postValue(ApiResponse.Error(clientApi.message))
-                }else{
-                    _getMapStories.postValue(ApiResponse.Success(clientApi))
-                }
-            }catch (e:Exception){
-                _getMapStories.postValue(ApiResponse.Error(e.message.toString()))
-            }
-
+        }catch (e:IOException){
+            _getDetailStory.postValue(ApiResponse.Error(e.message.toString()))
+        }catch (h:HttpException){
+            _getDetailStory.postValue(ApiResponse.Error(h.message.toString()))
         }
     }
+
+    fun getMapStories() = viewModelScope.launch {
+        try {
+            val clientApi = storyRepository.mapStory()
+            if(clientApi.error){
+                _getMapStories.postValue(ApiResponse.Error(clientApi.message))
+            }else{
+                _getMapStories.postValue(ApiResponse.Success(clientApi))
+            }
+        }catch (e:Exception){
+            _getMapStories.postValue(ApiResponse.Error(e.message.toString()))
+        }catch (h:HttpException){
+            _getMapStories.postValue(ApiResponse.Error(h.message.toString()))
+        }
+    }
+
 
 }

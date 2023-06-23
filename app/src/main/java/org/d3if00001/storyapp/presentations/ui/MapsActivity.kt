@@ -49,10 +49,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun updateProgress() {
         storyViewModel.getMapStories.observe(this){
             when(it){
-                is ApiResponse.Loading ->{}
+                is ApiResponse.Loading ->{/* loading */}
                 is ApiResponse.Success->{
                     it.data.listStory.map { fragmentStory->
-                        // Add a marker in Sydney and move the camera
                         val positionMarker = LatLng(fragmentStory.lat!!, fragmentStory.lon!!)
                         mMap.addMarker(
                             MarkerOptions()
@@ -61,9 +60,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         mMap.moveCamera(CameraUpdateFactory.newLatLng(positionMarker))
                     }
                 }
-                is ApiResponse.Error->{Toast.makeText(this,"Gagal Catch data!",Toast.LENGTH_SHORT).show()}
+                is ApiResponse.Error->{Toast.makeText(this,
+                    "Gagal Catch data! ${it.errorMessage}",
+                    Toast.LENGTH_SHORT).show()}
 
-                else -> {}
+                else -> {Toast.makeText(this,"Response tidak tersedia! Cobalagi!",Toast.LENGTH_SHORT).show()}
             }
         }
     }

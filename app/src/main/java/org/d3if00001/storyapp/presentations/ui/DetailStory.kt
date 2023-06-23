@@ -13,6 +13,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import org.d3if00001.storyapp.R
 import org.d3if00001.storyapp.data.remote.retrofit.APIService
+import org.d3if00001.storyapp.data.remote.retrofit.ApiResponse
 import org.d3if00001.storyapp.databinding.FragmentDetailStoryBinding
 import org.d3if00001.storyapp.presentations.viewmodels.StoryViewModel
 import java.text.SimpleDateFormat
@@ -45,39 +46,33 @@ class DetailStory : BottomSheetDialogFragment() {
         val id = DetailStoryArgs.fromBundle(arguments as Bundle).id
         val dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyy")
 
-        storyViewModel.getStatus().observe(viewLifecycleOwner) {
-            updateProgress(it)
-        }
-        storyViewModel.detailStory(id)
-        storyViewModel.getDetailStory.observe(viewLifecycleOwner) {
-            Glide.with(requireContext())
-                .load(it.photo)
-                .fitCenter()
-                .into(binding.photo)
-            binding.name.text = it.name
-            binding.descDetail.text = it.description
-            binding.createdAt.text = it.createdAt.format(dateFormat)
-        }
+        storyViewModel.getDetailStory(id)
+        updateProgress()
     }
-
-    private fun updateProgress(status: APIService.ApiStatus?) {
-        when (status) {
-            APIService.ApiStatus.SUCCESS -> {
-                binding.pgDetail.visibility = View.GONE
+    private fun updateProgress() {
+        storyViewModel.getDetailStory.observe(viewLifecycleOwner){
+            when(it){
+                is ApiResponse.Success->{
+                    Glide.with(requireContext())
+                        .load(it.data.story.photo)
+                        .fitCenter()
+                        .into(binding.photo)
+                    binding.name.text = it.data.story.name
+                    binding.descDetail.text = it.data.story.description
+                    binding.createdAt.text = it.data.story.createdAt
+                    binding.pgDetail.visibility = View.GONE
+                }
+                is ApiResponse.Loading->{
+                    binding.pgDetail.visibility = View.VISIBLE
+                }
+                is ApiResponse.Error->{
+                    binding.pgDetail.visibility = View.GONE
+                }
+                else->{
+                    binding.pgDetail.visibility = View.GONE
+                    Toast.makeText(context,"Cannot find Response",Toast.LENGTH_SHORT).show()
+                }
             }
-
-            APIService.ApiStatus.LOADING -> binding.pgDetail.visibility = View.VISIBLE
-            APIService.ApiStatus.FAILED -> {
-                binding.pgDetail.visibility = View.GONE
-                Toast.makeText(
-                    requireContext(),
-                    "Data Tidak Tersedia!",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-
-            else -> binding.pgDetail.visibility = View.GONE
         }
-
     }
 }

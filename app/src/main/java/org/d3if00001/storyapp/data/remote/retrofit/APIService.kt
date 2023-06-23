@@ -33,5 +33,5 @@ interface APIService {
         @Query("location")location:Int,
         @Query("page")page:Int?=1):GetAllStoriesResponse
     @GET("stories/{id}")
-    fun getDetailStories(@Header("Authorization")Bearer: String,@Path("id")id:String):Call<GetDetailResponse>
+    suspend fun getDetailStories(@Header("Authorization")Bearer: String,@Path("id")id:String):GetDetailResponse
 }
