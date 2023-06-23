@@ -30,5 +30,6 @@
     <string name="upload">Upload</string>
     <string name="name">name</string>
     <string name="imagepreview">imagePreview</string>
+    <string name="retry">Coba lagi</string>
     <!-- Strings used for fragments for navigation -->
 </resources>

@@ -130,11 +130,6 @@ class AddStory : Fragment() {
         binding.submitButton.setOnClickListener {
             viewModelStory.uploadImage(description = binding.descriptionInput.text.toString())
         }
-        binding.closeButton.setOnClickListener {viewBack->
-            viewBack.findNavController().navigate(
-                AddStoryDirections.actionAddStoryToHomeFragment()
-            )
-        }
     }
     private fun updateProgress(status: APIService.ApiStatus?) {
         when(status){

@@ -11,17 +11,22 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.map
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
+import androidx.paging.LoadStateAdapter
+import androidx.paging.map
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import org.d3if00001.storyapp.R
-import org.d3if00001.storyapp.data.remote.retrofit.APIService
 import org.d3if00001.storyapp.data.remote.retrofit.ApiResponse
-import org.d3if00001.storyapp.data.remote.retrofit.result.StoryResult
 import org.d3if00001.storyapp.data.remote.retrofit.result.getStoryResult
 import org.d3if00001.storyapp.databinding.FragmentHomeBinding
+import org.d3if00001.storyapp.presentations.utils.LoadingStateAdapter
 import org.d3if00001.storyapp.presentations.utils.StoryAdapter
 import org.d3if00001.storyapp.presentations.viewmodels.AuthenticationViewModel
 import org.d3if00001.storyapp.presentations.viewmodels.StoryViewModel
@@ -29,7 +34,6 @@ import org.d3if00001.storyapp.presentations.viewmodels.StoryViewModel
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
-    private lateinit var listNotes : ArrayList<getStoryResult>
     private val storyViewModel : StoryViewModel by viewModels()
     private val authenticationViewModel: AuthenticationViewModel by viewModels()
     override fun onAttach(context: Context) {
@@ -56,16 +60,18 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        listNotes = ArrayList()
         binding.rvNotes.setHasFixedSize(true)
         binding.pgHome.visibility = View.GONE
-
         storyViewModel.getNameUser.observe(viewLifecycleOwner) { name ->
             binding.textUsername.text = name
         }
         //data story
-        storyViewModel.getAllStories()
-        updateProgress()
+        setAdapter()
+
+        val layoutManager = LinearLayoutManager(requireContext())
+        binding.rvNotes.layoutManager = layoutManager
+        val itemDecoration = DividerItemDecoration(activity, layoutManager.orientation)
+        binding.rvNotes.addItemDecoration(itemDecoration)
 
         binding.maps.setOnClickListener {
             startActivity(Intent(context,MapsActivity::class.java))
@@ -80,38 +86,18 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun updateProgress() {
-        storyViewModel.getAllStories.observe(viewLifecycleOwner){
-            when(it){
-                is ApiResponse.Loading ->{
-                    binding.pgHome.visibility = View.VISIBLE
-                }
-                is ApiResponse.Success->{
-                    binding.pgHome.visibility = View.GONE
-                    it.data.listStory.map { fragmentStory->
-                        listNotes.add(fragmentStory)
-                        if (listNotes.isEmpty()) {
-                            binding.textNotAvailable.visibility = View.VISIBLE
-                        } else {
-                            val adapter = StoryAdapter(requireContext())
-                            adapter.setListNotes(listNotes)
-                            binding.rvNotes.adapter = adapter
-                            val layoutManager = LinearLayoutManager(requireContext())
-                            binding.rvNotes.layoutManager = layoutManager
-                            val itemDecoration = DividerItemDecoration(activity, layoutManager.orientation)
-                            binding.rvNotes.addItemDecoration(itemDecoration)
-                        }
-                    }
-                }
-                is ApiResponse.Error->{
-                    Toast.makeText(context,"Gagal Catch data!",Toast.LENGTH_SHORT).show()
-                    binding.pgHome.visibility = View.GONE
-                }
-
-                else -> {
-                    binding.pgHome.visibility = View.GONE
-                }
-            }
-        }
+    private fun setAdapter(){
+       lifecycleScope.launch {
+           val adapter = StoryAdapter()
+           binding.rvNotes.adapter = adapter.withLoadStateFooter(
+               footer = LoadingStateAdapter{
+                   adapter.retry()
+               }
+           )
+           storyViewModel.story.collectLatest {pagingData->
+               adapter.submitData(pagingData)
+           }
+       }
     }
+
 }

@@ -1,14 +1,20 @@
 package org.d3if00001.storyapp.presentations.viewmodels
 
-import android.os.Message
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import androidx.paging.Pager
+import androidx.paging.liveData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.d3if00001.storyapp.data.StoryPagingSource
 import org.d3if00001.storyapp.data.remote.retrofit.APIConfig
 import org.d3if00001.storyapp.data.remote.retrofit.APIService
 import org.d3if00001.storyapp.data.remote.retrofit.ApiResponse
@@ -17,6 +23,7 @@ import org.d3if00001.storyapp.data.remote.retrofit.response.GetDetailResponse
 import org.d3if00001.storyapp.data.remote.retrofit.result.DetailResult
 import org.d3if00001.storyapp.data.remote.retrofit.result.getStoryResult
 import org.d3if00001.storyapp.domain.repository.DataStoreRepository
+import org.d3if00001.storyapp.domain.repository.StoryRepository
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -24,7 +31,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class StoryViewModel @Inject constructor(
-    private val dataStoreRepository: DataStoreRepository
+    private val dataStoreRepository: DataStoreRepository,
+    storyRepository: StoryRepository
 ): ViewModel() {
     private val status = MutableLiveData<APIService.ApiStatus>()
     fun getStatus(): LiveData<APIService.ApiStatus> = status
@@ -36,16 +44,14 @@ class StoryViewModel @Inject constructor(
     private var _getNameUser:MutableLiveData<String> = MutableLiveData()
     val getNameUser:LiveData<String> = _getNameUser
 
-    private var _listLocationStory:MutableLiveData<List<getStoryResult>?> = MutableLiveData()
-    val listLocationStory:LiveData<List<getStoryResult>?> = _listLocationStory
-
     private var _getMapStories:MutableLiveData<ApiResponse<GetAllStoriesResponse>> = MutableLiveData()
     val getMapStories:LiveData<ApiResponse<GetAllStoriesResponse>> get() = _getMapStories
-
-    private var _getAllStories:MutableLiveData<ApiResponse<GetAllStoriesResponse>> = MutableLiveData()
-    val getAllStories:LiveData<ApiResponse<GetAllStoriesResponse>> get() = _getAllStories
-
-
+    val story:Flow<PagingData<getStoryResult>> = storyRepository.getStory().cachedIn(viewModelScope)
+    init {
+        viewModelScope.launch {
+            _getNameUser.value = dataStoreRepository.getName(AuthenticationViewModel.USER_KEY)
+        }
+    }
     fun detailStory(id:String){
         runBlocking {
             _authToken.value = dataStoreRepository.getToken(AddStoryViewModel.TOKEN_KEY)
@@ -100,26 +106,5 @@ class StoryViewModel @Inject constructor(
 
         }
     }
-    fun getAllStories(){
-        runBlocking {
-            _authToken.value = dataStoreRepository.getToken(AddStoryViewModel.TOKEN_KEY)
-            _getNameUser.value = dataStoreRepository.getName(AuthenticationViewModel.USER_KEY)
-        }
-        viewModelScope.launch {
-            try {
-                val clientApi = APIConfig.getApiService().getAllStories(
-                    Bearer = "Bearer ${_authToken.value}",
-                    location = 0,
-                    page = 1
-                )
-                if(clientApi.error){
-                    _getAllStories.postValue(ApiResponse.Error(clientApi.message))
-                }else{
-                    _getAllStories.postValue(ApiResponse.Success(clientApi))
-                }
-            }catch (e:Exception){
-                _getAllStories.postValue(ApiResponse.Error(e.message.toString()))
-            }
-        }
-    }
+
 }

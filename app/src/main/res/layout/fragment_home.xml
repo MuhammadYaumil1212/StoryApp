@@ -75,7 +75,6 @@
         app:layout_constraintTop_toTopOf="parent" />
 
 
-
     <ProgressBar
         android:id="@+id/pg_home"
         style="?android:attr/progressBarStyle"
@@ -97,8 +96,7 @@
         app:layout_constraintEnd_toStartOf="@+id/logout"
         app:layout_constraintHorizontal_bias="0.942"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/text_username"
-        app:layout_constraintVertical_bias="0.45"
+        app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/pin_drop_black" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -16,7 +16,7 @@ class StoryDiffUtil(private val mOldStoryList:List<getStoryResult>, private val 
     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
         val oldHoliday = mOldStoryList[oldItemPosition]
         val newHoliday = newStoryList[newItemPosition]
-        return oldHoliday.description == newHoliday.description && oldHoliday.photo == newHoliday.photo
+        return oldHoliday.id == newHoliday.id
     }
 }
 

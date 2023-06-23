@@ -31,5 +31,7 @@
     <string name="imagepreview">imagePreview</string>
     <string name="title_activity_maps" translatable="false">MapsActivity</string>
     <string name="api_key" templateMergeStrategy="preserve" translatable="false">AIzaSyBsfee8YepGnw-0QGhWSFmXniudcCkMsvU</string>
+    <string name="coba_lagi" translatable="false">Coba lagi</string>
+    <string name="retry">retry</string>
     <!-- Strings used for fragments for navigation -->
 </resources>
