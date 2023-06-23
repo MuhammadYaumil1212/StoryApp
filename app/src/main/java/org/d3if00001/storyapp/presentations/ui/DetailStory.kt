@@ -44,7 +44,6 @@ class DetailStory : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val id = DetailStoryArgs.fromBundle(arguments as Bundle).id
-        val dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyy")
 
         storyViewModel.getDetailStory(id)
         updateProgress()
