@@ -49,8 +49,6 @@ class StoryRepositoryImpl @Inject constructor(
     companion object{
         private const val MAXIMAL_SIZE = 1000000
     }
-    private val _uploadResponse:MutableLiveData<ApiResponse<AddNewStoryResponse>> = MutableLiveData()
-    val uploadResponse:LiveData<ApiResponse<AddNewStoryResponse>> = _uploadResponse
     override fun getStory(): Flow<PagingData<getStoryResult>> {
         val pagingSource = StoryPagingSource(
             dataStore = dataStoreRepository,
