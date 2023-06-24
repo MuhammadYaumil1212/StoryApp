@@ -37,11 +37,11 @@ class StoryAdapter:PagingDataAdapter<getStoryResult,StoryAdapter.ViewHolder>(
     companion object {
         private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<getStoryResult>() {
             override fun areItemsTheSame(oldItem: getStoryResult, newItem: getStoryResult): Boolean {
-                return oldItem == newItem
+                return oldItem.id == newItem.id
             }
 
             override fun areContentsTheSame(oldItem: getStoryResult, newItem: getStoryResult): Boolean {
-                return oldItem.id == newItem.id
+                return oldItem == newItem
             }
         }
     }
