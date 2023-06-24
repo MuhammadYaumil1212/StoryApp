@@ -29,6 +29,7 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import org.d3if00001.storyapp.R
 import org.d3if00001.storyapp.data.remote.retrofit.APIService
+import org.d3if00001.storyapp.data.remote.retrofit.ApiResponse
 import org.d3if00001.storyapp.databinding.FragmentAddStoryBinding
 import org.d3if00001.storyapp.presentations.viewmodels.AddStoryViewModel
 import java.io.File
@@ -118,7 +119,7 @@ class AddStory : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModelStory.getStatus().observe(viewLifecycleOwner){ updateProgress(it) }
+
         binding.imageCamera.setOnClickListener {
             if(!allPermissionsGranted()){
                 ActivityCompat.requestPermissions(requireActivity(), REQUIRED_PERMISSIONS,
@@ -129,22 +130,38 @@ class AddStory : Fragment() {
         }
         binding.submitButton.setOnClickListener {
             viewModelStory.uploadImage(description = binding.descriptionInput.text.toString())
+            updateProgress()
         }
     }
-    private fun updateProgress(status: APIService.ApiStatus?) {
-        when(status){
-            APIService.ApiStatus.SUCCESS->{
-                binding.pgInputStory.visibility =View.GONE
-                findNavController().navigate(AddStoryDirections.actionAddStoryToHomeFragment())
+    private fun updateProgress() {
+        viewModelStory.uploadImageResponse.observe(viewLifecycleOwner) {
+            when (it) {
+                is ApiResponse.Success -> {
+                    binding.pgInputStory.visibility = View.GONE
+                    view?.findNavController()
+                        ?.navigate(AddStoryDirections.actionAddStoryToHomeFragment())
+                }
+
+                is ApiResponse.Error -> {
+                    binding.pgInputStory.visibility = View.GONE
+                    Toast.makeText(context, "Error : ${it.errorMessage}", Toast.LENGTH_SHORT).show()
+                }
+
+                is ApiResponse.Loading -> {
+                    binding.pgInputStory.visibility = View.VISIBLE
+                }
+
+                is ApiResponse.Empty->{
+                    binding.pgInputStory.visibility = View.GONE
+                    view?.findNavController()
+                        ?.navigate(AddStoryDirections.actionAddStoryToHomeFragment())
+                }
+
+                else -> {
+                    Toast.makeText(context, "Error Response dont available", Toast.LENGTH_SHORT)
+                        .show()
+                }
             }
-            APIService.ApiStatus.LOADING->binding.pgInputStory.visibility = View.VISIBLE
-            APIService.ApiStatus.FAILED->{
-                binding.pgInputStory.visibility = View.GONE
-                Toast.makeText(requireContext(),
-                    "Gagal Input! Silahkan Coba Lagi",
-                    Toast.LENGTH_SHORT).show()
-            }
-            else ->binding.pgInputStory.visibility = View.GONE
         }
     }
     private fun startGallery(){

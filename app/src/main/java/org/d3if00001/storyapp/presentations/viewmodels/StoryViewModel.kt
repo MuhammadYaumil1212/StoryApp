@@ -53,6 +53,7 @@ class StoryViewModel @Inject constructor(
     }
     fun getDetailStory(id:String) = viewModelScope.launch {
         try{
+            _getDetailStory.postValue(ApiResponse.Loading)
             val clientApi = storyRepository.detailStory(id)
             if(clientApi.error){
                 _getDetailStory.postValue(ApiResponse.Error(clientApi.message))
