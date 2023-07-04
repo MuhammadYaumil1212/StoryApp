@@ -14,9 +14,6 @@ class StoryPagingSource(
         private val dataStore:DataStoreRepository
     ):
     PagingSource<Int, getStoryResult>() {
-    private companion object {
-        const val INITIAL_PAGE_INDEX = 1
-    }
     override fun getRefreshKey(state: PagingState<Int,getStoryResult>): Int? {
         return state.anchorPosition?.let { anchorPosition ->
             val anchorPage = state.closestPageToPosition(anchorPosition)
@@ -37,9 +34,6 @@ class StoryPagingSource(
                 prevKey = if (position == 1) null else position - 1,
                 nextKey = if (responseData.listStory.isEmpty()) null else position+1,
             )
-        } catch (e: IOException) {
-            // IOException for network failures.
-            return LoadResult.Error(e)
         } catch (e: HttpException) {
             // HttpException for any non-2xx HTTP status codes.
             return LoadResult.Error(e)

@@ -9,6 +9,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -22,6 +23,9 @@ import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.d3if00001.storyapp.data.StoryPagingSource
+import org.d3if00001.storyapp.data.database.Item.StoryResponseItem
+import org.d3if00001.storyapp.data.database.StoryDatabase
+import org.d3if00001.storyapp.data.remote.mediator.StoryRemoteMediator
 import org.d3if00001.storyapp.data.remote.retrofit.APIConfig
 import org.d3if00001.storyapp.data.remote.retrofit.APIService
 import org.d3if00001.storyapp.data.remote.retrofit.ApiResponse
@@ -44,19 +48,28 @@ import javax.inject.Inject
 
 class StoryRepositoryImpl @Inject constructor(
     private val apiService: APIService,
-    private val dataStoreRepository: DataStoreRepository
+    private val dataStoreRepository: DataStoreRepository,
+    private val database:StoryDatabase
 ):StoryRepository{
     companion object{
         private const val MAXIMAL_SIZE = 1000000
     }
-    override fun getStory(): Flow<PagingData<getStoryResult>> {
+    @OptIn(ExperimentalPagingApi::class)
+    override fun getStory(): Flow<PagingData<StoryResponseItem>> {
         val pagingSource = StoryPagingSource(
             dataStore = dataStoreRepository,
             apiService = apiService
         )
         return Pager(
             config = PagingConfig(pageSize = 5),
-        ){ pagingSource }.flow
+            remoteMediator = StoryRemoteMediator(
+                database = database,
+                dataStoreRepository = dataStoreRepository,
+                apiService = apiService
+            )
+        ) {
+            database.storyDao().getAllStory()
+        }.flow
     }
 
     override suspend fun detailStory(id: String):GetDetailResponse {

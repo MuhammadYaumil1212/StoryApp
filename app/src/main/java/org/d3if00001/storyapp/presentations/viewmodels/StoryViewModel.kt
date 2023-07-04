@@ -1,33 +1,22 @@
 package org.d3if00001.storyapp.presentations.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import androidx.paging.Pager
-import androidx.paging.liveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import org.d3if00001.storyapp.data.StoryPagingSource
-import org.d3if00001.storyapp.data.remote.retrofit.APIConfig
-import org.d3if00001.storyapp.data.remote.retrofit.APIService
+import org.d3if00001.storyapp.data.database.Item.StoryResponseItem
 import org.d3if00001.storyapp.data.remote.retrofit.ApiResponse
 import org.d3if00001.storyapp.data.remote.retrofit.response.GetAllStoriesResponse
 import org.d3if00001.storyapp.data.remote.retrofit.response.GetDetailResponse
-import org.d3if00001.storyapp.data.remote.retrofit.result.DetailResult
 import org.d3if00001.storyapp.data.remote.retrofit.result.getStoryResult
 import org.d3if00001.storyapp.domain.repository.DataStoreRepository
 import org.d3if00001.storyapp.domain.repository.StoryRepository
-import retrofit2.Call
-import retrofit2.Callback
 import retrofit2.HttpException
-import retrofit2.Response
 import java.io.IOException
 import javax.inject.Inject
 
@@ -44,13 +33,15 @@ class StoryViewModel @Inject constructor(
 
     private val _getDetailStory: MutableLiveData<ApiResponse<GetDetailResponse>> = MutableLiveData()
     val getDetailStory:LiveData<ApiResponse<GetDetailResponse>> = _getDetailStory
-
-    val story:Flow<PagingData<getStoryResult>> = storyRepository.getStory().cachedIn(viewModelScope)
+    fun story():Flow<PagingData<StoryResponseItem>>{
+       return storyRepository.getStory().cachedIn(viewModelScope)
+    }
     init {
         viewModelScope.launch {
             _getNameUser.value = dataStoreRepository.getName(AuthenticationViewModel.USER_KEY)
         }
     }
+
     fun getDetailStory(id:String) = viewModelScope.launch {
         try{
             _getDetailStory.postValue(ApiResponse.Loading)
