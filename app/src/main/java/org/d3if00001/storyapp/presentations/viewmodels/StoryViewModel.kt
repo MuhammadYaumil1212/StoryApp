@@ -33,7 +33,7 @@ class StoryViewModel @Inject constructor(
 
     private val _getDetailStory: MutableLiveData<ApiResponse<GetDetailResponse>> = MutableLiveData()
     val getDetailStory:LiveData<ApiResponse<GetDetailResponse>> = _getDetailStory
-    fun story():Flow<PagingData<StoryResponseItem>>{
+    fun story():LiveData<PagingData<StoryResponseItem>>{
        return storyRepository.getStory().cachedIn(viewModelScope)
     }
     init {

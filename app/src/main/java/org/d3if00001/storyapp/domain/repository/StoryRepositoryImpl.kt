@@ -55,7 +55,7 @@ class StoryRepositoryImpl @Inject constructor(
         private const val MAXIMAL_SIZE = 1000000
     }
     @OptIn(ExperimentalPagingApi::class)
-    override fun getStory(): Flow<PagingData<StoryResponseItem>> {
+    override fun getStory(): LiveData<PagingData<StoryResponseItem>> {
         val pagingSource = StoryPagingSource(
             dataStore = dataStoreRepository,
             apiService = apiService
@@ -69,7 +69,7 @@ class StoryRepositoryImpl @Inject constructor(
             )
         ) {
             database.storyDao().getAllStory()
-        }.flow
+        }.liveData
     }
 
     override suspend fun detailStory(id: String):GetDetailResponse {

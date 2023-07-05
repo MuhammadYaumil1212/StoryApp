@@ -99,8 +99,8 @@ class HomeFragment : Fragment() {
                    adapter.retry()
                }
            )
-           storyViewModel.story().collectLatest { pagingData->
-               adapter.submitData(pagingData)
+           storyViewModel.story().observe(viewLifecycleOwner){pagingData->
+               adapter.submitData(lifecycle, pagingData)
            }
        }
     }

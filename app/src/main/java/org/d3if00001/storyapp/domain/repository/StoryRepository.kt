@@ -15,7 +15,7 @@ import retrofit2.Call
 import java.io.File
 
 interface StoryRepository {
-    fun getStory():Flow<PagingData<StoryResponseItem>>
+    fun getStory():LiveData<PagingData<StoryResponseItem>>
     suspend fun detailStory(id:String):GetDetailResponse
     suspend fun mapStory():GetAllStoriesResponse
     suspend fun uploadImageRequest(
