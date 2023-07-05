@@ -36,7 +36,7 @@ class StoryAdapter:PagingDataAdapter<StoryResponseItem,StoryAdapter.ViewHolder>(
         getItem(position)?.let { holder.bind(it) }
     }
     companion object {
-        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<StoryResponseItem>() {
+        val DIFF_CALLBACK = object : DiffUtil.ItemCallback<StoryResponseItem>() {
             override fun areItemsTheSame(oldItem: StoryResponseItem, newItem: StoryResponseItem): Boolean {
                 return oldItem.id == newItem.id
             }

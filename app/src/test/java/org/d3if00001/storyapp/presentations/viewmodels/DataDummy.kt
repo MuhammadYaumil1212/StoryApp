@@ -1,12 +1,12 @@
-package org.d3if00001.storyapp.utils
+package org.d3if00001.storyapp.presentations.viewmodels
 
-import org.d3if00001.storyapp.data.remote.retrofit.result.getStoryResult
+import org.d3if00001.storyapp.data.database.Item.StoryResponseItem
 
 object DataDummy {
-    fun generateDataStory():List<getStoryResult>{
-        val storyList = ArrayList<getStoryResult>()
+    fun generateDataStory():List<StoryResponseItem>{
+        val storyList = ArrayList<StoryResponseItem>()
         for (iterate in 0..10){
-            val story = getStoryResult(
+            val story = StoryResponseItem(
                 id = "$iterate",
                 description = "Description",
                 photo = "https://unsplash.com/photos/a-man-in-a-space-suit-walking-through-a-desert-UzcmuacTX7s",
