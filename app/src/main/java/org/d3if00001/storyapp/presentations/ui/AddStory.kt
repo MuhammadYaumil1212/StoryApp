@@ -149,6 +149,7 @@ class AddStory : Fragment() {
 
                 is ApiResponse.Loading -> {
                     binding.pgInputStory.visibility = View.VISIBLE
+                    binding.submitButton.visibility = View.GONE
                 }
 
                 is ApiResponse.Empty->{
